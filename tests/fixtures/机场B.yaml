@@ -1,0 +1,7 @@
+proxies:
+  - name: 日本东京
+    type: hysteria2
+    server: tyo.b.example
+    port: "8443"
+    password: b-tyo
+    sni: tyo.b.example

@@ -1,0 +1,15 @@
+# A complete airport config: only `proxies` may be used.
+mixed-port: 7890
+mode: rule
+dns:
+  enable: true
+  nameserver: [223.5.5.5]
+proxies:
+  - { name: 美国LA, type: ss, server: la.a.example, port: 8388, cipher: aes-256-gcm, password: a-la }
+  - { name: 新加坡01, type: ss, server: sg.a.example, port: 8388, cipher: aes-256-gcm, password: a-sg }
+  - { name: 坏节点, type: ss, port: 8388 }
+proxy-groups:
+  - { name: 机场A节点选择, type: select, proxies: [美国LA, 新加坡01] }
+rules:
+  - DOMAIN-SUFFIX,google.com,机场A节点选择
+  - MATCH,机场A节点选择
