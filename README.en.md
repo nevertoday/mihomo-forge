@@ -7,6 +7,8 @@ It turns several short-lived subscription YAML snapshots into long-term, managea
 
 🔒 Your node configs are parsed and generated only in this browser. Nothing is uploaded. No backend, no analytics, no account.
 
+**Use it online: <https://nevertoday.github.io/mihomo-forge/>** (a static page — your nodes never leave your browser)
+
 ---
 
 ## Why
