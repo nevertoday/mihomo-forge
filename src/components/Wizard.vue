@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ArrowLeft, ArrowRight, Check, Download, FileCode2, FileUp, Save } from 'lucide-vue-next'
+import { ArrowLeft, ArrowRight, Check, FileUp, Sparkles } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
 import BuildReport from './BuildReport.vue'
+import DownloadPanel from './DownloadPanel.vue'
 import DropZone from './DropZone.vue'
+import ImportGuide from './ImportGuide.vue'
 import NodeListDialog from './NodeListDialog.vue'
 import PresetPicker from './PresetPicker.vue'
 import PrivacyNote from './PrivacyNote.vue'
@@ -56,6 +58,7 @@ function next() {
       <p class="eyebrow">{{ t('wizard.step', { n: step }) }}</p>
       <h1 class="page-title">{{ current.title }}</h1>
       <p class="page-lede">{{ current.lede }}</p>
+      <p v-if="step === 3 || step === 4" class="keep-default"><Sparkles aria-hidden="true" />{{ t('wizard.keepDefault') }}</p>
     </header>
 
     <div v-if="step === 1" class="stack">
@@ -83,17 +86,18 @@ function next() {
     <PresetPicker v-else-if="step === 4" />
 
     <div v-else class="stack">
-      <BuildReport />
-      <div class="row final">
-        <button type="button" class="btn btn-lg btn-primary" :disabled="!store.build.ok" @click="store.downloadConfig()"><Download />{{ t('wizard.download') }}</button>
-        <button type="button" class="btn btn-lg" @click="store.save()"><Save />{{ t('topbar.save') }}</button>
-        <button type="button" class="btn btn-lg" @click="showYaml = true"><FileCode2 />{{ t('wizard.viewYaml') }}</button>
-      </div>
+      <DownloadPanel @view-yaml="showYaml = true" />
+      <ImportGuide />
+      <details class="checks">
+        <summary>{{ t('buildPage.checksTitle') }}</summary>
+        <BuildReport hide-verdict />
+      </details>
     </div>
 
     <div class="dock">
       <div class="dock-meta">
-        {{ t('count.sourcesShort', { n: store.sources.length }) }} · {{ t('count.nodesShort', { n: store.nodeCount }) }}
+        <span v-if="!canNext" class="need-file">{{ t('wizard.needFile') }}</span>
+        <template v-else>{{ t('count.sourcesShort', { n: store.sources.length }) }} · {{ t('count.nodesShort', { n: store.nodeCount }) }}</template>
       </div>
       <span class="spacer"></span>
       <button v-if="step === 1" type="button" class="btn btn-quiet" @click="emit('finish')">{{ t('wizard.skip') }}</button>
@@ -124,6 +128,9 @@ function next() {
 .alt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
 .link { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: 0; background: none; color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .link svg { width: 14px; height: 14px; }
-.final { gap: 10px; }
+.keep-default { display: inline-flex; align-items: center; gap: 6px; margin: 12px 0 0; padding: 4px 10px; background: var(--notice-success-bg); color: var(--notice-success-ink); font-size: 13px; font-weight: 700; }
+.keep-default svg { width: 15px; height: 15px; }
+.need-file { color: var(--notice-warning-ink); font-weight: 700; }
+.checks summary { cursor: pointer; font-weight: 700; margin-bottom: 10px; }
 @media (max-width: 760px) { .step-title { display: none; } .steps button { justify-content: center; padding-inline-end: 0; } }
 </style>

@@ -3,18 +3,17 @@ import { RotateCcw } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { currentSetting, editableSetting, optionName, strategyOptionGroups } from '@/app/business'
 import { providerUrl } from '@/catalog/ruleProviders'
-import { MODULES } from '@/catalog/services'
 import { serviceGroupName } from '@/core/strategies'
 import { serviceName, t, tDynamic } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
-import type { RuleService } from '@/types'
+import type { ModuleId, RuleService } from '@/types'
 import RoutePreview from './RoutePreview.vue'
 
 const props = defineProps<{ service: RuleService; enabled: boolean }>()
 const store = useProjectStore()
 
 const moduleLabel = computed(() =>
-  props.service.module === 'base' ? t('modules.base') : (MODULES.find((m) => m.id === props.service.module)?.label ?? ''),
+  props.service.module === 'base' ? t('modules.base') : t(`moduleNames.${props.service.module as Exclude<ModuleId, 'base'>}`),
 )
 const description = computed(() => tDynamic(`serviceDesc.${props.service.id}`))
 const groups = computed(() => strategyOptionGroups(store.build, store.settings.regions).filter((g) => g.options.length))

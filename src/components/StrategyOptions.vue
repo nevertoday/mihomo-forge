@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
 import { fill, NAMING, regionLabel } from '@/core/naming'
 import { regionName, t } from '@/i18n'
@@ -21,12 +21,19 @@ const regionCounts = computed(() => {
 })
 
 /** Regions with nodes first, then the rest of the catalog. */
-const regions = computed(() =>
+const allRegions = computed(() =>
   [...store.settings.regions].sort((a, b) => {
     if (a.id === OTHER_REGION_ID) return 1
     if (b.id === OTHER_REGION_ID) return -1
     return (regionCounts.value.get(b.id) ?? 0) - (regionCounts.value.get(a.id) ?? 0)
   }),
+)
+
+/** Empty regions are noise for most people: hidden until asked for. */
+const showEmpty = ref(false)
+const emptyCount = computed(() => allRegions.value.filter((r) => !regionCounts.value.get(r.id)).length)
+const regions = computed(() =>
+  showEmpty.value || !store.build.nodes.length ? allRegions.value : allRegions.value.filter((r) => regionCounts.value.get(r.id)),
 )
 
 function modes(id: string) {
@@ -108,6 +115,9 @@ const globals = computed(() => [
           </tbody>
         </table>
       </div>
+      <button v-if="emptyCount && store.build.nodes.length" type="button" class="btn btn-sm btn-quiet toggle-empty" @click="showEmpty = !showEmpty">
+        {{ showEmpty ? t('strategy.hideEmpty') : t('strategy.showEmpty', { n: emptyCount }) }}
+      </button>
     </section>
 
     <section class="block">
@@ -149,4 +159,5 @@ const globals = computed(() => [
 tr.dim td { color: var(--muted); }
 .src-row { display: grid; gap: 6px; padding: 12px; }
 .chip-toggle .num { opacity: 0.7; }
+.toggle-empty { justify-self: start; }
 </style>

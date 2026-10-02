@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { resolveServices } from '@/catalog/presets'
-import { ALL_SERVICES, MODULES } from '@/catalog/services'
+import { ALL_SERVICES } from '@/catalog/services'
 import PresetPicker from '@/components/PresetPicker.vue'
 import ServiceDetail from '@/components/ServiceDetail.vue'
 import { serviceName, t } from '@/i18n'
@@ -16,7 +16,7 @@ const selected = computed(() => ALL_SERVICES.find((s) => s.id === selectedId.val
 const defaultName = (id: string) => store.build.business.find((b) => b.service.id === id)?.group.proxies[0]
 
 const sections = computed(() => {
-  const label = (m: ModuleId) => (m === 'base' ? t('modules.base') : (MODULES.find((x) => x.id === m)?.label ?? m))
+  const label = (m: ModuleId) => (m === 'base' ? t('modules.base') : t(`moduleNames.${m as Exclude<ModuleId, 'base'>}`))
   const order: ModuleId[] = ['base', 'ads', 'ai', 'developer', 'streaming', 'social', 'gaming', 'crypto']
   return order.map((m) => ({ id: m, label: label(m), services: ALL_SERVICES.filter((s) => s.module === m) }))
 })
@@ -63,14 +63,14 @@ function toggle(service: RuleService) {
               <span class="svc-name">{{ s.icon }} {{ serviceName(s) }}<small v-if="s.optional" class="opt">{{ t('service.optional') }}</small></span>
               <small class="svc-default"><bdi>{{ enabledIds.has(s.id) ? (s.fixedTarget ?? defaultName(s.id) ?? '') : t('rulesPage.notEnabled') }}</bdi></small>
             </button>
+            <span v-if="s.required" class="always">{{ t('rulesPage.alwaysOn') }}</span>
             <button
+              v-else
               type="button"
               class="switch"
               role="switch"
               :aria-checked="enabledIds.has(s.id)"
-              :disabled="s.required"
               :aria-label="enabledIds.has(s.id) ? t('rulesPage.disable', { name: serviceName(s) }) : t('rulesPage.enable', { name: serviceName(s) })"
-              :title="s.required ? t('rulesPage.alwaysOn') : ''"
               @click="toggle(s)"
             ></button>
           </div>
@@ -100,7 +100,7 @@ function toggle(service: RuleService) {
 .switch[aria-checked="true"] { border-color: var(--ink); background: var(--ink); }
 .switch[aria-checked="true"]::after { transform: translateX(12px); background: var(--paper); }
 [dir="rtl"] .switch[aria-checked="true"]::after { transform: translateX(-12px); }
-.switch:disabled { opacity: 0.45; }
+.always { flex: none; font-size: 11px; font-weight: 700; color: var(--muted); }
 @media (max-width: 860px) {
   .services-layout { grid-template-columns: 1fr; }
   .service-list { position: static; max-height: 320px; }

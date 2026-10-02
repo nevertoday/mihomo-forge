@@ -25,10 +25,24 @@ function toggleModule(id: ModuleId) {
   <div class="preset-picker">
     <div class="block">
       <p class="eyebrow">{{ t('preset.scope') }}</p>
-      <div class="segmented" role="group" :aria-label="t('preset.scopeLabel')">
-        <button v-for="p in PRESETS" :key="p.id" type="button" :aria-pressed="rules.preset === p.id" @click="pickPreset(p.id)">{{ p.label }}</button>
+      <div class="presets" role="radiogroup" :aria-label="t('preset.scopeLabel')">
+        <button
+          v-for="p in PRESETS"
+          :key="p.id"
+          type="button"
+          role="radio"
+          class="preset"
+          :aria-checked="rules.preset === p.id"
+          @click="pickPreset(p.id)"
+        >
+          <span class="preset-head">
+            <span class="dot" aria-hidden="true"></span>
+            <strong>{{ t(`presetNames.${p.id}`) }}</strong>
+            <span v-if="p.id === 'standard'" class="badge">{{ t('presetNames.recommended') }}</span>
+          </span>
+          <small>{{ t(`presets.${p.id}`) }}</small>
+        </button>
       </div>
-      <p class="section-note">{{ t(`presets.${rules.preset}`) }}</p>
     </div>
     <div class="block">
       <p class="eyebrow">{{ t('preset.modules') }}</p>
@@ -42,7 +56,7 @@ function toggleModule(id: ModuleId) {
           @click="toggleModule(m.id)"
         >
           <span class="box" aria-hidden="true"></span>
-          <span class="module-copy"><strong>{{ m.label }}</strong><small>{{ t(`modules.${m.id}`) }}</small></span>
+          <span class="module-copy"><strong>{{ t(`moduleNames.${m.id}`) }}</strong><small>{{ t(`modules.${m.id}`) }}</small></span>
         </button>
       </div>
     </div>
@@ -53,6 +67,17 @@ function toggleModule(id: ModuleId) {
 .preset-picker { display: grid; gap: 24px; }
 .block { display: grid; gap: 8px; justify-items: start; }
 .block .eyebrow { margin: 0; }
+.presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; width: 100%; }
+.preset { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--line); background: var(--panel); text-align: start; }
+.preset:hover { border-color: var(--line-strong); }
+.preset[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.preset-head { display: flex; align-items: center; gap: 8px; }
+.preset-head strong { font-size: 15px; }
+.preset small { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.dot { flex: none; width: 16px; height: 16px; border: 1.5px solid var(--line-strong); border-radius: 50%; display: grid; place-items: center; }
+.preset[aria-checked="true"] .dot { border-color: var(--ink); background: var(--ink); }
+.preset[aria-checked="true"] .dot::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--paper); }
+.badge { font-size: 11px; font-weight: 800; padding: 1px 6px; background: var(--notice-success-bg); color: var(--notice-success-ink); border: 1px solid var(--notice-success-border); }
 .modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; width: 100%; }
 .module {
   display: flex;

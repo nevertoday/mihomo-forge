@@ -6,6 +6,7 @@ import { issueText, t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
 import type { IssueLevel } from '@/types'
 
+defineProps<{ hideVerdict?: boolean }>()
 const store = useProjectStore()
 const b = computed(() => store.build)
 const errors = computed(() => b.value.issues.filter((i) => i.level === 'ERROR'))
@@ -40,7 +41,7 @@ const issues = computed(() => [...b.value.issues].sort((x, y) => ORDER.indexOf(x
         <span>{{ c.text }}</span>
       </li>
     </ul>
-    <p class="verdict" :class="b.ok ? 'ok' : 'bad'">{{ b.ok ? t('report.ok') : t('report.bad') }}</p>
+    <p v-if="!hideVerdict" class="verdict" :class="b.ok ? 'ok' : 'bad'">{{ b.ok ? t('report.ok') : t('report.bad') }}</p>
 
     <ul v-if="issues.length" class="issues">
       <li v-for="(i, idx) in issues" :key="idx" class="notice" :class="{ 'notice-error': i.level === 'ERROR', 'notice-warning': i.level === 'WARNING', 'notice-plain': i.level === 'INFO' }">
