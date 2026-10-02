@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.local
+# Never commit real subscription snapshots
+*.yaml
+*.yml
+!tests/fixtures/**/*.yaml
+!tests/fixtures/**/*.yml
+!.github/**/*.yml
