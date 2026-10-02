@@ -13,6 +13,8 @@ const DEFAULT_PROJECT_NAME: Record<Locale, string> = {
   ar: 'إعدادات OpenClash',
 }
 
+export const isDefaultProjectName = (name: string) => Object.values(DEFAULT_PROJECT_NAME).includes(name)
+
 /** Defaults from spec §7: all node strategies on, Standard + AI + Developer, global dedupe. */
 export function createDefaultSettings(locale: Locale = 'zh-CN'): ProjectSettings {
   const regions = cloneRegions()

@@ -92,6 +92,26 @@ import { currentView, go, NAV_ITEMS } from './nav'
 .rail-item:hover::before, .rail-item:focus-visible::before { opacity: 1; }
 .rail-foot { margin-top: auto; }
 
+@media (min-width: 1200px) {
+  .rail { align-items: stretch; padding: 12px 10px; }
+  .rail-mark { margin-inline-start: 6px; }
+  .rail-nav { gap: 2px; }
+  .rail-item {
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding-inline: 10px;
+    font-weight: 600;
+  }
+  .rail-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rail-item::before { display: none; }
+  .rail-item:hover { background: var(--active-wash); }
+  .rail-item[aria-current="page"] { background: var(--active-wash); }
+  .rail-item[aria-current="page"]::after { inset-inline-end: auto; inset-inline-start: -10px; }
+  .rail-foot { width: 100%; }
+}
+
 @media (max-width: 760px) {
   .rail {
     inset: auto 0 0 0;

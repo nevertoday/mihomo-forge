@@ -115,7 +115,7 @@ function remove() {
 .sc-file { margin: -6px 0 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sc-wait { margin: 0; }
 .sc-counts { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; border: 1px solid var(--line); }
-.sc-counts div { padding: 8px 10px; border-inline-end: 1px solid var(--line); }
+.sc-counts div { display: flex; flex-direction: column; justify-content: space-between; padding: 8px 10px; border-inline-end: 1px solid var(--line); }
 .sc-counts div:last-child { border-inline-end: 0; }
 .sc-counts dt { color: var(--muted); font-size: 11px; font-weight: 700; }
 .sc-counts dd { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.2; }

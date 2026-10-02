@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ArrowRight, Hammer } from 'lucide-vue-next'
+import { ArrowRight, Download, Wand2 } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { go } from '@/app/nav'
-import { PRESETS } from '@/catalog/presets'
 import { MODULES } from '@/catalog/services'
 import DropZone from '@/components/DropZone.vue'
 import PrivacyNote from '@/components/PrivacyNote.vue'
@@ -16,8 +15,8 @@ const store = useProjectStore()
 const b = computed(() => store.build)
 
 const ruleSummary = computed(() => {
-  const preset = PRESETS.find((p) => p.id === store.settings.rules.preset)?.label
-  const mods = MODULES.filter((m) => store.settings.rules.modules.includes(m.id)).map((m) => m.label)
+  const preset = t(`presetNames.${store.settings.rules.preset}`)
+  const mods = MODULES.filter((m) => store.settings.rules.modules.includes(m.id)).map((m) => t(`moduleNames.${m.id}`))
   return [preset, ...mods].join(' + ')
 })
 const errors = computed(() => b.value.issues.filter((i) => i.level === 'ERROR').length)
@@ -25,7 +24,30 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
 </script>
 
 <template>
-  <div class="page">
+  <div v-if="!store.sources.length" class="page start">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">{{ t('overview.eyebrow') }}</p>
+        <h1 class="page-title">{{ t('overview.emptyTitle') }}</h1>
+        <p class="page-lede">{{ t('overview.emptyLede') }}</p>
+      </div>
+    </header>
+    <ol class="start-steps">
+      <li><span class="n num">1</span>{{ t('overview.empty1') }}</li>
+      <li><span class="n num">2</span>{{ t('overview.empty2') }}</li>
+      <li><span class="n num">3</span>{{ t('overview.empty3') }}</li>
+    </ol>
+    <div class="stack">
+      <DropZone />
+      <PrivacyNote />
+      <button type="button" class="btn start-wizard" @click="emit('wizard')"><Wand2 />{{ t('overview.emptyWizard') }}</button>
+    </div>
+    <section class="section">
+      <ProjectFileCard />
+    </section>
+  </div>
+
+  <div v-else class="page">
     <header class="page-head">
       <div>
         <p class="eyebrow">{{ t('overview.eyebrow') }}</p>
@@ -37,7 +59,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
       </div>
       <div class="row">
         <button type="button" class="btn" @click="emit('wizard')">{{ t('overview.rerunWizard') }}</button>
-        <button type="button" class="btn btn-primary" @click="go('build')"><Hammer />{{ t('overview.rebuild') }}</button>
+        <button type="button" class="btn btn-primary" @click="go('build')"><Download />{{ t('overview.rebuild') }}</button>
       </div>
     </header>
 
@@ -105,6 +127,11 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
 </template>
 
 <style scoped>
+.start-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; padding: 0; list-style: none; }
+.start-steps li { display: flex; gap: 10px; align-items: flex-start; padding: 14px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; line-height: 1.55; }
+.start-steps .n { flex: none; display: grid; place-items: center; width: 26px; height: 26px; background: var(--ink); color: var(--paper); }
+.start-wizard { justify-self: start; }
+@media (max-width: 760px) { .start-steps { grid-template-columns: 1fr; } }
 .update { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 18px; border: 1px solid var(--line); background: var(--panel); }
 .stat.bad strong { color: var(--notice-error-ink); }
 @media (max-width: 760px) { .update { grid-template-columns: 1fr; } }

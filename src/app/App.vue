@@ -64,23 +64,18 @@ function onDrop(e: DragEvent) {
   e.preventDefault()
   if (e.dataTransfer?.files.length) store.importFiles([...e.dataTransfer.files])
 }
-function onBeforeUnload(e: BeforeUnloadEvent) {
-  if (store.dirty) e.preventDefault()
-}
 
 onMounted(() => {
   window.addEventListener('dragenter', onDragEnter)
   window.addEventListener('dragleave', onDragLeave)
   window.addEventListener('dragover', onDragOver)
   window.addEventListener('drop', onDrop)
-  window.addEventListener('beforeunload', onBeforeUnload)
 })
 onBeforeUnmount(() => {
   window.removeEventListener('dragenter', onDragEnter)
   window.removeEventListener('dragleave', onDragLeave)
   window.removeEventListener('dragover', onDragOver)
   window.removeEventListener('drop', onDrop)
-  window.removeEventListener('beforeunload', onBeforeUnload)
 })
 </script>
 

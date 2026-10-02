@@ -3,7 +3,7 @@ import { computed, markRaw, reactive, ref, shallowRef, watch } from 'vue'
 import { buildConfig } from '@/core/builder'
 import { SourceParseError, sourceNameFromFile } from '@/core/parser'
 import { diffSources, loadSourceFile, renameSource, type SourceDiff } from '@/core/parser/loadSource'
-import { createDefaultSettings, normalizeSettings } from '@/core/project/defaults'
+import { createDefaultSettings, isDefaultProjectName, normalizeSettings } from '@/core/project/defaults'
 import { exportProject, importProject, PROJECT_FILE_NAME, ProjectFileError } from '@/core/project/projectFile'
 import { locale, t, tDynamic } from '@/i18n'
 import type { ProjectSettings, Source } from '@/types'
@@ -51,7 +51,8 @@ export const useProjectStore = defineStore('project', () => {
   const signature = computed(() =>
     JSON.stringify({ settings, sources: sources.value.map((s) => [s.id, s.name, s.fileHash]) }),
   )
-  const dirty = computed(() => ready.value && signature.value !== savedSignature.value)
+  /** Autosave status shown in the top bar. Projects save themselves; there is no save button to forget. */
+  const saveState = ref<'idle' | 'saved' | 'error'>('idle')
 
   let toastSeq = 0
   function notify(text: string, tone: Toast['tone'] = 'info') {
@@ -146,17 +147,28 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   async function save() {
+    const sig = signature.value
     const data: StoredProject = { settings: plain(settings), sources: plain(sources.value), savedAt: new Date().toISOString() }
     try {
       await idbSet(STORAGE_KEY, data)
-      savedSignature.value = signature.value
+      savedSignature.value = sig
       savedAt.value = data.savedAt
       hasSavedProject.value = true
-      notify(t('toast.saved'), 'success')
+      saveState.value = 'saved'
     } catch (err) {
-      notify(t('toast.saveFailed', { detail: (err as Error).message }), 'error')
+      // Report once per failure streak; the app keeps working in memory.
+      if (saveState.value !== 'error') notify(t('toast.saveFailed', { detail: (err as Error).message }), 'error')
+      saveState.value = 'error'
     }
   }
+
+  // Autosave: any change is written to IndexedDB shortly after the user stops editing.
+  let saveTimer: ReturnType<typeof setTimeout> | undefined
+  watch(signature, (sig) => {
+    if (!ready.value || sig === savedSignature.value) return
+    clearTimeout(saveTimer)
+    saveTimer = setTimeout(save, 600)
+  })
 
   async function restore() {
     try {
@@ -166,6 +178,7 @@ export const useProjectStore = defineStore('project', () => {
         setSources(data.sources ?? [])
         savedAt.value = data.savedAt
         hasSavedProject.value = true
+        saveState.value = 'saved'
       }
     } catch {
       // IndexedDB can be unavailable (private mode); the app still works in memory.
@@ -180,6 +193,7 @@ export const useProjectStore = defineStore('project', () => {
     setSources([])
     hasSavedProject.value = false
     savedAt.value = null
+    saveState.value = 'idle'
     savedSignature.value = signature.value
     notify(t('toast.cleared'), 'success')
   }
@@ -210,13 +224,11 @@ export const useProjectStore = defineStore('project', () => {
     return true
   }
 
-  // A brand-new project follows the interface language for its name and group names.
+  // A project with no files yet follows the interface language for its name and group names.
   watch(locale, (next) => {
-    if (!ready.value || hasSavedProject.value || sources.value.length) return
-    const fresh = createDefaultSettings(next)
-    settings.name = fresh.name
+    if (!ready.value || sources.value.length || !isDefaultProjectName(settings.name)) return
+    settings.name = createDefaultSettings(next).name
     settings.outputLocale = next
-    savedSignature.value = signature.value
   })
 
   return {
@@ -229,7 +241,7 @@ export const useProjectStore = defineStore('project', () => {
     hasSavedProject,
     build,
     nodeCount,
-    dirty,
+    saveState,
     notify,
     importFiles,
     resolvePending,

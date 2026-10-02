@@ -25,7 +25,7 @@ export const SERVICE_BY_ID: Record<string, RuleService> = Object.fromEntries(
 )
 
 export interface ModuleInfo {
-  id: ModuleId
+  id: Exclude<ModuleId, 'base'>
   label: string
 }
 

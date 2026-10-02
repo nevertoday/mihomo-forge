@@ -41,7 +41,8 @@ const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() =>
       <p class="section-note order-note">{{ t('sourcesPage.orderNote') }}</p>
     </section>
 
-    <section class="section">
+    <details class="section advanced">
+      <summary>{{ t('sourcesPage.advanced') }}</summary>
       <div class="section-head">
         <h2 class="section-title">{{ t('sourcesPage.dedupeTitle') }}</h2>
       </div>
@@ -55,7 +56,7 @@ const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() =>
         <input v-model="store.settings.excludeInfoNodes" type="checkbox" />
         <span class="check-label"><strong>{{ t('sourcesPage.excludeInfo') }}</strong><small>{{ t('sourcesPage.excludeInfoHint') }}</small></span>
       </label>
-    </section>
+    </details>
 
     <NodeListDialog v-if="viewing" :source="viewing" @close="viewing = null" />
   </div>
@@ -67,4 +68,6 @@ const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() =>
 .card-check { border: 1px solid var(--line); background: var(--panel); padding: 12px; }
 .card-check:has(input:checked) { border-color: var(--ink); }
 .info-check { margin-top: 10px; }
+.advanced > summary { cursor: pointer; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+.advanced[open] > summary { color: var(--ink); }
 </style>
