@@ -22,6 +22,7 @@ const checklist = computed(() => {
     { ok: true, text: t('report.regions', { n: s.regionStrategies }) },
     { ok: true, text: t('report.sourceGroups', { n: s.sourceStrategies }) },
     ...(s.compositeStrategies ? [{ ok: true, text: t('report.composites', { n: s.compositeStrategies }) }] : []),
+    ...(s.filterStrategies ? [{ ok: true, text: t('report.filters', { n: s.filterStrategies }) }] : []),
     { ok: true, text: t('report.business', { n: s.businessStrategies }) },
     { ok: true, text: `${t('report.providers', { n: s.ruleProviders })} · ${t('report.rules', { n: s.rules })}` },
     { ok: !refErrors.value.length, text: refErrors.value.length ? t('report.refsBad', { n: refErrors.value.length }) : t('report.refsOk') },

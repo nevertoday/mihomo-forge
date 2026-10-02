@@ -9,7 +9,7 @@ export interface StrategyOption {
 }
 
 export interface StrategyOptionGroup {
-  id: 'region' | 'source' | 'composite' | 'general'
+  id: 'region' | 'source' | 'composite' | 'filter' | 'general'
   label: string
   options: StrategyOption[]
 }
@@ -22,6 +22,7 @@ export function strategyOptionGroups(build: BuildResult, regions: RegionDefiniti
     { id: 'region', label: t('service.groupRegion'), options: by('region') },
     { id: 'source', label: t('service.groupSource'), options: by('source') },
     { id: 'composite', label: t('service.groupComposite'), options: by('composite') },
+    { id: 'filter', label: t('service.groupFilter'), options: by('filter') },
     {
       id: 'general',
       label: t('service.groupGeneral'),

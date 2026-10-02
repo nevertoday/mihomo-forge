@@ -37,6 +37,7 @@ provider-a.yaml  provider-b.yaml  provider-c.yaml  …
   - 地域別：`🇺🇸 アメリカ・手動` · `🇺🇸 アメリカ・自動` …（ノードのない地域は空グループを作りません）
   - プロバイダー別：`📦 provider-a` · `📦 provider-b` …
   - プロバイダー × 地域：必要なときだけ作成し、全組み合わせは生成しません
+  - ノード名のキーワード：たとえば名前に「IEPL」を含むノード。ソースや地域でも絞り込め、作成前に一致結果をプレビューできます
 - **サービス戦略**：ChatGPT、Claude、Gemini、GitHub、YouTube、Netflix、Telegram などは、それぞれ独立した `select` グループで、**地域もプロバイダーも選べます**
 - **モジュール式のルールプリセット**：Lite / Standard / Full / Custom ＋ AI、Developer、Streaming、Social、Gaming、Crypto、Ads
 - **厳密なルール順序**：LAN → 広告 → AI → 開発 → ストリーミング → SNS → その他 → 中国本土 → 海外 → MATCH（Gemini は必ず Google より前）

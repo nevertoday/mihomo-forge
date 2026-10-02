@@ -37,6 +37,7 @@ The everyday workflow is one step: download the new YAML, drop it in, confirm th
   - By region: `🇺🇸 United States Manual` · `🇺🇸 United States Auto` … (no empty groups)
   - By provider: `📦 provider-a` · `📦 provider-b` …
   - Provider × region combinations: on demand only — never a Cartesian product
+  - By node-name keywords: e.g. nodes whose name contains “IEPL”, optionally limited to some sources and a region, with a live preview of the matches
 - **Service strategies**: ChatGPT, Claude, Gemini, GitHub, YouTube, Netflix, Telegram… each is its own `select` group that can **use regions and providers alike**
 - **Modular rule presets**: Lite / Standard / Full / Custom + AI, Developer, Streaming, Social, Gaming, Crypto, Ads modules
 - **Strict rule order**: LAN → ads → AI → developer → streaming → social → other services → mainland China → overseas → MATCH (Gemini always before Google)

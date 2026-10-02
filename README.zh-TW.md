@@ -37,6 +37,7 @@
   - 依地區：`🇺🇸 美國手動` · `🇺🇸 美國自動` …（沒有節點的地區不產生空群組）
   - 依供應商：`📦 奶昔` · `📦 機場A` …
   - 供應商 × 地區組合：按需建立，不產生笛卡兒積
+  - 依節點名稱關鍵字：例如名稱含「IEPL」或「專線」的節點，可再限定來源與地區，建立前即時預覽符合結果
 - **服務策略**：ChatGPT、Claude、Gemini、GitHub、YouTube、Netflix、Telegram 等各自是獨立的 `select` 群組，**可以選地區，也可以選供應商**
 - **模組化規則預設**：Lite / Standard / Full / Custom + AI、Developer、Streaming、Social、Gaming、Crypto、Ads 模組
 - **嚴格的規則順序**：區域網路 → 廣告 → AI → 開發 → 串流 → 社群 → 其他服務 → 中國大陸 → 海外 → MATCH（Gemini 一定先於 Google）
