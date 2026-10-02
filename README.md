@@ -39,6 +39,7 @@
   - 按地区：`🇺🇸 美国手动` · `🇺🇸 美国自动` …（没有节点的地区不生成空组）
   - 按供应商：`📦 奶昔` · `📦 机场A` …
   - 供应商 × 地区组合：按需创建，不生成笛卡尔积
+  - 按节点名关键词：例如名字含「IEPL」或「专线」的节点，可再限定来源和地区，创建前实时预览匹配结果
 - **业务策略**：ChatGPT、Claude、Gemini、GitHub、YouTube、Netflix、Telegram 等每个业务都是独立的 `select` 组，**既能选地区，也能选供应商**
 - **模块化规则预设**：Lite / Standard / Full / Custom + AI、Developer、Streaming、Social、Gaming、Crypto、Ads 模块
 - **严格规则顺序**：局域网 → 广告 → AI → 开发 → 流媒体 → 社交 → 其他业务 → 国内 → 国外 → MATCH（Gemini 永远先于 Google）

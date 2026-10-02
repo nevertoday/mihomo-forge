@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CompositeEditor from '@/components/CompositeEditor.vue'
+import FilterEditor from '@/components/FilterEditor.vue'
 import StrategyOptions from '@/components/StrategyOptions.vue'
 import { t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
@@ -18,6 +19,7 @@ const store = useProjectStore()
       <p class="chip chip-dark">{{ t('count.strategyGroups', { n: store.build.strategies.length }) }}</p>
     </header>
     <StrategyOptions />
+    <div class="composite-wrap"><FilterEditor /></div>
     <div class="composite-wrap"><CompositeEditor /></div>
   </div>
 </template>

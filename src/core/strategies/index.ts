@@ -4,6 +4,7 @@ import type {
   BuildIssue,
   BusinessGroup,
   BusinessStrategySetting,
+  FilterStrategy,
   GroupMode,
   Locale,
   ProxyGroup,
@@ -152,6 +153,76 @@ export function generateCompositeGroups(ctx: StrategyContext, issues: BuildIssue
       kind: 'composite',
       group: makeGroup(name, c.mode, names(members), settings),
       pool: { kind: 'composite', count: members.length, regionId: region.id, sourceName: source.name },
+      nodeCount: members.length,
+    })
+  }
+  return out
+}
+
+/** Split user input like `IEPL, 专线  香港` into terms. Commas (，too) and whitespace separate terms. */
+export function parseTerms(text: string): string[] {
+  return text
+    .split(/[,，、\s]+/)
+    .map((t) => t.trim())
+    .filter(Boolean)
+}
+
+export interface CompiledFilter {
+  include: RegExp[]
+  exclude: RegExp[]
+  invalid: string[]
+}
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/** Plain keywords match literally; with `regex` each term is a case-insensitive pattern. Bad patterns are reported, not thrown. */
+export function compileFilter(f: Pick<FilterStrategy, 'include' | 'exclude' | 'regex'>): CompiledFilter {
+  const invalid: string[] = []
+  const build = (terms: string[]) =>
+    terms.flatMap((t) => {
+      try {
+        return [new RegExp(f.regex ? t : escapeRe(t), 'iu')]
+      } catch {
+        invalid.push(t)
+        return []
+      }
+    })
+  return { include: build(f.include), exclude: build(f.exclude), invalid }
+}
+
+/** Does this node belong to the filter group? Matches the ORIGINAL name, never the `[source]` prefix. */
+export function matchesFilter(
+  node: Pick<ProxyNode, 'originalName' | 'sourceId' | 'regionId'>,
+  f: Pick<FilterStrategy, 'include' | 'sourceIds' | 'regionId'>,
+  compiled: CompiledFilter,
+): boolean {
+  if (f.sourceIds.length && !f.sourceIds.includes(node.sourceId)) return false
+  if (f.regionId && (node.regionId ?? OTHER_REGION_ID) !== f.regionId) return false
+  // Every include term failed to compile: match nothing rather than everything.
+  if (f.include.length && !compiled.include.length) return false
+  if (compiled.include.length && !compiled.include.some((re) => re.test(node.originalName))) return false
+  return !compiled.exclude.some((re) => re.test(node.originalName))
+}
+
+/** Keyword groups (spec extension): user-named, explicit node lists, never empty. */
+export function generateFilterGroups(ctx: StrategyContext, issues: BuildIssue[] = []): StrategyGroup[] {
+  const { nodes, settings } = ctx
+  const out: StrategyGroup[] = []
+  for (const f of settings.filters ?? []) {
+    const name = f.name.trim()
+    if (!name) continue
+    const compiled = compileFilter(f)
+    for (const pattern of compiled.invalid) issues.push({ level: 'WARNING', code: 'filter-pattern', params: { name, pattern } })
+    const members = nodes.filter((n) => matchesFilter(n, f, compiled))
+    if (!members.length) {
+      issues.push({ level: 'WARNING', code: 'filter-empty', params: { name } })
+      continue
+    }
+    out.push({
+      ref: `filter:${f.id}`,
+      kind: 'filter',
+      group: makeGroup(name, f.mode, names(members), settings),
+      pool: { kind: 'filter', count: members.length },
       nodeCount: members.length,
     })
   }

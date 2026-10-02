@@ -45,6 +45,11 @@ describe.skipIf(!MIHOMO)('Mihomo core accepts every generated config', () => {
                 s.rules.modules = ['ai', 'developer', 'streaming', 'social', 'gaming', 'crypto', 'ads']
                 s.strategy.sourceAuto[sources[0].id] = true
                 s.strategy.composites.push({ id: 'c1', sourceId: sources[0].id, regionId: 'us', mode: 'url-test' })
+                s.strategy.filters.push({
+                  id: 'f1', name: '🔎 美国 日本', include: ['美国', '日本'], exclude: ['东京'], regex: false,
+                  sourceIds: [], regionId: null, mode: 'fallback',
+                })
+                s.business.chatgpt = { defaultRef: 'filter:f1', candidates: ['filter:f1', 'composite:c1', 'global:auto'] }
               }
             }),
           )

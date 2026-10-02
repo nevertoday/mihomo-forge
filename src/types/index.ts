@@ -54,6 +54,27 @@ export interface RegionDefinition {
 
 export type GroupMode = 'select' | 'url-test' | 'fallback'
 
+/**
+ * A group built from node-name keywords, e.g. every node whose original name contains
+ * “IEPL”, optionally limited to some sources and one region.
+ */
+export interface FilterStrategy {
+  id: string
+  /** Group name written to config.yaml. */
+  name: string
+  /** Match if the original node name contains ANY of these (case-insensitive). Empty = all. */
+  include: string[]
+  /** Drop nodes whose original name contains ANY of these. */
+  exclude: string[]
+  /** Treat include/exclude entries as regular expressions instead of plain text. */
+  regex: boolean
+  /** Limit to these sources; empty = every source. */
+  sourceIds: string[]
+  /** Limit to one region; null = any region. */
+  regionId: string | null
+  mode: GroupMode
+}
+
 export interface CompositeStrategy {
   id: string
   sourceId: string
@@ -147,6 +168,7 @@ export interface StrategySettings {
   /** sourceId -> also generate a url-test group */
   sourceAuto: Record<string, boolean>
   composites: CompositeStrategy[]
+  filters: FilterStrategy[]
   testUrl: string
   interval: number
   tolerance: number
@@ -205,6 +227,8 @@ export type IssueCode =
   | 'provider-clash'
   | 'composite-orphan'
   | 'composite-empty'
+  | 'filter-empty'
+  | 'filter-pattern'
   | 'candidate-removed'
   | 'default-missing'
   | 'no-candidates'
@@ -235,7 +259,7 @@ export interface BuildIssue {
 
 /** What a node-strategy group contains, for explanations in the UI. */
 export interface PoolInfo {
-  kind: 'all' | 'region' | 'source' | 'composite'
+  kind: 'all' | 'region' | 'source' | 'composite' | 'filter'
   count: number
   regionId?: string
   sourceName?: string
@@ -253,7 +277,7 @@ export interface ProxyGroup {
 /** A generated node-strategy group plus the metadata the UI needs to explain it. */
 export interface StrategyGroup {
   ref: StrategyRef
-  kind: 'global' | 'region' | 'source' | 'composite'
+  kind: 'global' | 'region' | 'source' | 'composite' | 'filter'
   group: ProxyGroup
   pool: PoolInfo
   nodeCount: number
@@ -275,6 +299,7 @@ export interface BuildStats {
   regionStrategies: number
   sourceStrategies: number
   compositeStrategies: number
+  filterStrategies: number
   businessStrategies: number
   ruleProviders: number
   rules: number

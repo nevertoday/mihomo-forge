@@ -7,6 +7,7 @@ import { generateRuleProviders, generateRules } from '@/core/rules'
 import {
   generateBusinessGroups,
   generateCompositeGroups,
+  generateFilterGroups,
   generateGlobalGroups,
   generateRegionGroups,
   generateSourceGroups,
@@ -105,6 +106,7 @@ export function buildConfig(sources: Source[], settings: ProjectSettings): Build
     ...generateRegionGroups(ctx),
     ...generateSourceGroups(ctx),
     ...generateCompositeGroups(ctx, issues),
+    ...generateFilterGroups(ctx, issues),
   ]
 
   // 13. business strategies
@@ -164,6 +166,7 @@ export function buildConfig(sources: Source[], settings: ProjectSettings): Build
       regionStrategies: strategies.filter((s) => s.kind === 'region').length,
       sourceStrategies: strategies.filter((s) => s.kind === 'source').length,
       compositeStrategies: strategies.filter((s) => s.kind === 'composite').length,
+      filterStrategies: strategies.filter((s) => s.kind === 'filter').length,
       businessStrategies: business.length,
       ruleProviders: Object.keys(config['rule-providers'] as object).length,
       rules: (config.rules as string[]).length,
