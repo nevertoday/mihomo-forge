@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import { computed } from 'vue'
 import { poolText, serviceName, t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
@@ -28,19 +29,19 @@ const shown = computed(() => rows.value.slice(0, MAX))
   <figure class="route" :aria-label="t('route.aria', { service: label })">
     <figcaption class="eyebrow">{{ t('route.title') }}</figcaption>
     <div class="node node-service">
-      <span>{{ business.service.icon }} {{ t('route.traffic', { service: label }) }}</span>
+      <span>{{ t('route.traffic', { service: label }) }}</span>
       <small dir="ltr">{{ business.service.ruleProviders.map((p) => p.name).join(' · ') || t('route.customRules') }}</small>
     </div>
     <div class="stem" aria-hidden="true"></div>
     <div class="node node-group">
-      <span dir="auto">{{ business.group.name }}</span>
+      <span dir="auto">{{ plain(business.group.name) }}</span>
       <small>{{ t('route.candidates', { n: rows.length }) }}</small>
     </div>
     <div class="stem" aria-hidden="true"></div>
     <ul class="branches">
       <li v-for="r in shown" :key="r.ref" :class="{ 'is-default': r.isDefault }">
         <div class="node node-leaf">
-          <span><bdi>{{ r.name }}</bdi><span v-if="r.isDefault" class="xxd-badge" data-variant="solid">{{ t('route.default') }}</span></span>
+          <span><bdi>{{ plain(r.name) }}</bdi><span v-if="r.isDefault" class="xxd-badge" data-tone="action">{{ t('route.default') }}</span></span>
           <small>{{ r.pool }}</small>
         </div>
       </li>

@@ -85,7 +85,7 @@ function setRegion(fingerprint: string, regionId: string) {
                     @change="setRegion(node.fingerprint, ($event.target as HTMLSelectElement).value)"
                   >
                     <option value="__auto">{{ t('nodeList.regionAuto', { region: labelOf(out?.regionId ?? OTHER_REGION_ID) }) }}</option>
-                    <option v-for="r in store.settings.regions" :key="r.id" :value="r.id">{{ r.icon }} {{ regionName(r) }}</option>
+                    <option v-for="r in store.settings.regions" :key="r.id" :value="r.id">{{ regionName(r) }}</option>
                   </select>
                 </label>
               </td>

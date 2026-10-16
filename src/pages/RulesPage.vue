@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import { computed, ref } from 'vue'
 import { resolveServices } from '@/catalog/presets'
 import { ALL_SERVICES } from '@/catalog/services'
@@ -59,8 +60,8 @@ function toggle(service: RuleService) {
             :class="{ 'is-on': enabledIds.has(s.id), 'is-active': selected.id === s.id }"
           >
             <button type="button" class="svc-main" :aria-current="selected.id === s.id ? 'true' : undefined" @click="selectedId = s.id">
-              <span class="svc-name">{{ s.icon }} {{ serviceName(s) }}<span v-if="s.optional" class="xxd-badge" data-variant="outline">{{ t('service.optional') }}</span></span>
-              <small class="svc-default"><bdi>{{ enabledIds.has(s.id) ? (s.fixedTarget ?? defaultName(s.id) ?? '') : t('rulesPage.notEnabled') }}</bdi></small>
+              <span class="svc-name">{{ serviceName(s) }}<span v-if="s.optional" class="xxd-badge" data-variant="outline">{{ t('service.optional') }}</span></span>
+              <small class="svc-default"><bdi>{{ enabledIds.has(s.id) ? plain(s.fixedTarget ?? defaultName(s.id) ?? '') : t('rulesPage.notEnabled') }}</bdi></small>
             </button>
             <span v-if="s.required" class="always">{{ t('rulesPage.alwaysOn') }}</span>
             <input

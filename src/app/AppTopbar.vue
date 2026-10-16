@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import { LOCALES, locale, setLocale, t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
 import type { Locale } from '@/types'
-import { go } from './nav'
+import { currentView, go } from './nav'
 import { themePref, toggleTheme } from './theme'
 
 const store = useProjectStore()
@@ -32,7 +32,7 @@ const nameSize = computed(() =>
     <p class="meta">{{ t('count.sourcesShort', { n: store.sources.length }) }} · {{ t('count.nodesShort', { n: store.nodeCount }) }}</p>
     <span v-if="store.saveState === 'saved'" class="saved" role="status" :title="t('projectFile.storage')"><Icon name="CircleCheck" :size="14" />{{ t('topbar.autosaved') }}</span>
     <div class="spacer"></div>
-    <label class="xxd-select lang" data-size="sm">
+    <label class="xxd-select lang" data-size="sm" data-variant="bare">
       <Icon name="Languages" :size="16" />
       <span class="xxd-sr-only">{{ t('topbar.language') }}</span>
       <select :value="locale" :title="t('topbar.language')" @change="setLocale(($event.target as HTMLSelectElement).value as Locale)">
@@ -42,7 +42,7 @@ const nameSize = computed(() =>
     <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :aria-label="dark ? t('topbar.toLight') : t('topbar.toDark')" @click="toggleTheme">
       <Icon v-if="dark" name="Sun" :size="16" /><Icon v-else name="Moon" :size="16" />
     </button>
-    <button type="button" class="xxd-btn start" data-variant="primary" data-size="sm" @click="download">
+    <button v-if="currentView !== 'build'" type="button" class="xxd-btn start" data-variant="primary" data-size="sm" @click="download">
       <Icon name="Download" :size="16" /><span>{{ t('topbar.download') }}</span>
       <span v-if="store.sources.length && !store.build.ok" class="xxd-dot alert" data-tone="danger" aria-hidden="true"></span>
     </button>

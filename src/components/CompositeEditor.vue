@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import Icon from '@/components/Icon.vue'
 import { computed, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
@@ -31,7 +32,7 @@ const example = computed(() => {
   const out = store.settings.outputLocale
   const src = store.sources.find((s) => s.id === sourceId.value)?.name ?? store.sources[0]?.name ?? 'Provider'
   const region = store.settings.regions.find((r) => r.id === (regionId.value || 'us'))!
-  return fill(NAMING[out].composite, { icon: region.icon, source: src, region: regionLabel(region, out) })
+  return plain(fill(NAMING[out].composite, { icon: region.icon, source: src, region: regionLabel(region, out) }))
 })
 
 /** Only offer combinations that actually contain nodes. */
@@ -94,9 +95,9 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
         </thead>
         <tbody>
           <tr v-for="c in list" :key="c.id">
-            <td dir="auto"><strong>{{ builtByRef.get(`composite:${c.id}`)?.group.name ?? c.displayName ?? '—' }}</strong></td>
+            <td dir="auto"><strong>{{ plain(builtByRef.get(`composite:${c.id}`)?.group.name ?? c.displayName) || '—' }}</strong></td>
             <td dir="auto">{{ sourceName(c.sourceId) }}</td>
-            <td>{{ regionOf(c.regionId)?.icon }} {{ regionOf(c.regionId) ? regionName(regionOf(c.regionId)!) : '' }}</td>
+            <td>{{ regionOf(c.regionId) ? regionName(regionOf(c.regionId)!) : '' }}</td>
             <td><span class="xxd-badge">{{ modeLabel(c.mode) }}</span></td>
             <td class="num">{{ builtByRef.get(`composite:${c.id}`)?.nodeCount ?? 0 }}</td>
             <td class="end"><button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('composite.remove')" @click="remove(c.id)"><Icon name="Trash" :size="16" /></button></td>
@@ -117,7 +118,7 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
         <span class="xxd-label">{{ t('composite.colRegion') }}</span>
         <span class="xxd-select"><select v-model="regionId"  required :disabled="!sourceId">
           <option value="" disabled>{{ t('composite.pickRegion') }}</option>
-          <option v-for="r in regionsForSource" :key="r.id" :value="r.id">{{ r.icon }} {{ regionName(r) }} ({{ counts.get(`${sourceId}|${r.id}`) }})</option>
+          <option v-for="r in regionsForSource" :key="r.id" :value="r.id">{{ regionName(r) }} ({{ counts.get(`${sourceId}|${r.id}`) }})</option>
         </select></span>
       </label>
       <label class="xxd-field">
@@ -135,7 +136,7 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
         <button type="submit" class="xxd-btn" data-variant="primary" :disabled="!sourceId || !regionId">{{ t('composite.create') }}</button>
       </div>
     </form>
-    <button v-else type="button" class="xxd-btn add" :disabled="!store.sources.length" @click="open = true"><Icon name="Plus" :size="16" /><span>{{ t('composite.add') }}</span></button>
+    <button v-else type="button" class="xxd-btn add" data-size="sm" :disabled="!store.sources.length" @click="open = true"><Icon name="Plus" :size="16" /><span>{{ t('composite.add') }}</span></button>
   </section>
 </template>
 

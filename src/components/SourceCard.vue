@@ -68,15 +68,11 @@ async function remove() {
       <div class="sc-title">
         <template v-if="!editing">
           <h3 dir="auto">{{ source.name }}</h3>
-          <button v-if="actions" type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil" :size="16" /></button>
+          <button v-if="actions" type="button" class="xxd-btn rename-btn" data-variant="ghost" data-icon-only data-size="xs" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil" :size="14" /></button>
         </template>
         <form v-else class="rename" @submit.prevent="commitRename">
           <input ref="nameInput" v-model="draft" class="xxd-input" maxlength="32" dir="auto" :aria-label="t('sourceCard.nameLabel')" @keydown.esc="editing = false" @blur="commitRename" />
         </form>
-      </div>
-      <div v-if="actions && total > 1" class="row order">
-        <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><Icon name="ArrowUp" :size="16" /></button>
-        <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><Icon name="ArrowDown" :size="16" /></button>
       </div>
     </header>
     <p v-if="error" class="sc-error">{{ error }}</p>
@@ -90,7 +86,7 @@ async function remove() {
         <div><dt>{{ t('sourceCard.rejected') }}</dt><dd class="num" :class="{ muted: !source.rejected.length }">{{ source.rejected.length }}</dd></div>
       </dl>
       <div class="sc-regions">
-        <span v-for="r in regionChips" :key="r.id" class="xxd-badge" :title="r.label"><span>{{ r.icon }}</span><span class="num">{{ r.count }}</span></span>
+        <span v-for="r in regionChips" :key="r.id" class="xxd-badge"><span>{{ r.label }}</span><span class="num">{{ r.count }}</span></span>
       </div>
     </template>
 
@@ -98,6 +94,10 @@ async function remove() {
       <button type="button" class="xxd-btn" data-size="sm" :disabled="waiting" @click="emit('view', source)"><Icon name="Eye" :size="16" /><span>{{ t('sourceCard.view') }}</span></button>
       <button type="button" class="xxd-btn" data-size="sm" @click="fileInput?.click()"><Icon name="FileUp" :size="16" /><span>{{ t('sourceCard.replace') }}</span></button>
       <span class="spacer"></span>
+      <div v-if="total > 1" class="order">
+        <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><Icon name="ArrowUp" :size="16" /></button>
+        <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><Icon name="ArrowDown" :size="16" /></button>
+      </div>
       <button type="button" class="xxd-btn danger" data-variant="ghost" data-icon-only data-size="sm" :aria-label="t('sourceCard.remove')" @click="remove"><Icon name="Trash" :size="16" /></button>
       <input ref="fileInput" type="file" accept=".yaml,.yml,.txt" hidden @change="replace(($event.target as HTMLInputElement).files)" />
     </footer>
@@ -126,5 +126,6 @@ async function remove() {
 /* Button labels never shrink: the row wraps instead. */
 .sc-actions .xxd-btn { flex: none; }
 .danger:hover:not(:disabled) { color: var(--danger); }
-.order { gap: 0; }
+.order { display: flex; }
+.rename-btn { color: var(--muted); }
 </style>

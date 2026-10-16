@@ -101,7 +101,7 @@ function resetRegion(id: string) {
           <span class="check-label"><strong>{{ t('basePage.mergeRules') }}</strong><small>{{ t('basePage.mergeRulesHint') }}</small></span>
         </label>
       </div>
-      <details v-else class="preview">
+      <details v-else class="xxd-collapse preview">
         <summary>{{ t('basePage.viewTemplate') }}</summary>
         <pre class="xxd-code" dir="ltr">{{ preview }}</pre>
       </details>
@@ -141,7 +141,7 @@ function resetRegion(id: string) {
       <div v-if="showRegions" class="grid regions">
         <div v-for="r in editableRegions" :key="r.id" class="card region-card">
           <div class="row">
-            <strong>{{ r.icon }} {{ regionName(r) }}</strong>
+            <strong>{{ regionName(r) }}</strong>
             <span class="spacer"></span>
             <label class="prio"><span class="muted">{{ t('basePage.priority') }}</span><input v-model.number="r.priority" class="xxd-input num" type="number" /></label>
             <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('common.reset')" :title="t('common.reset')" @click="resetRegion(r.id)"><Icon name="RotateCcw" :size="16" /></button>

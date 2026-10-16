@@ -4,9 +4,10 @@ import Icon from './Icon.vue'
 </script>
 
 <template>
-  <div class="xxd-banner privacy" data-size="sm"><Icon name="LockKeyhole" :size="16" /><p class="xxd-banner__title">{{ t('app.privacy') }}</p></div>
+  <p class="privacy"><Icon name="LockKeyhole" :size="14" />{{ t('app.privacy') }}</p>
 </template>
 
 <style scoped>
-.privacy { margin: 0; align-items: center; }
+.privacy { display: flex; align-items: center; gap: var(--space-1-5); margin: 0; color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+.privacy :deep(.ui-icon) { flex: none; }
 </style>

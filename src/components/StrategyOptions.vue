@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import { computed, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
 import { fill, NAMING, regionLabel } from '@/core/naming'
@@ -57,7 +58,7 @@ const globals = computed(() => [
       <div class="grid opts">
         <label v-for="g in globals" :key="g.key" class="xxd-choice card-check">
           <input class="xxd-check" v-model="s[g.key]" type="checkbox" />
-          <span class="check-label"><strong>{{ g.label }}</strong><small>{{ g.hint }}</small></span>
+          <span class="check-label"><strong>{{ plain(g.label) }}</strong><small>{{ g.hint }}</small></span>
         </label>
       </div>
     </section>
@@ -80,7 +81,7 @@ const globals = computed(() => [
           :disabled="!s.byRegion"
           @click="s.enabledRegions[r.id] = !s.enabledRegions[r.id]"
         >
-          {{ r.icon }} {{ regionName(r) }} <span class="num">{{ regionCounts.get(r.id) ?? 0 }}</span>
+          {{ regionName(r) }} <span class="num">{{ regionCounts.get(r.id) ?? 0 }}</span>
         </button>
       </div>
       <div v-else class="xxd-table-wrap" :class="{ off: !s.byRegion }">
@@ -97,18 +98,18 @@ const globals = computed(() => [
           <tbody>
             <tr v-for="r in regions" :key="r.id" :class="{ dim: !s.enabledRegions[r.id] }">
               <td><label class="xxd-choice tight"><input class="xxd-check" v-model="s.enabledRegions[r.id]" type="checkbox" :disabled="!s.byRegion" :aria-label="regionName(r)" /></label></td>
-              <td><strong>{{ r.icon }} {{ regionName(r) }}</strong></td>
+              <td><strong>{{ regionName(r) }}</strong></td>
               <td class="num">{{ regionCounts.get(r.id) ?? 0 }}</td>
               <td>
                 <label class="xxd-choice tight">
                   <input class="xxd-check" v-model="modes(r.id).manual" type="checkbox" :disabled="!s.byRegion || !s.enabledRegions[r.id]" />
-                  <span class="muted">{{ outName(naming.regionManual, r) }}</span>
+                  <span class="muted">{{ plain(outName(naming.regionManual, r)) }}</span>
                 </label>
               </td>
               <td>
                 <label class="xxd-choice tight">
                   <input class="xxd-check" v-model="modes(r.id).auto" type="checkbox" :disabled="!s.byRegion || !s.enabledRegions[r.id]" />
-                  <span class="muted">{{ outName(naming.regionAuto, r) }}</span>
+                  <span class="muted">{{ plain(outName(naming.regionAuto, r)) }}</span>
                 </label>
               </td>
             </tr>
@@ -130,10 +131,10 @@ const globals = computed(() => [
       </header>
       <div v-if="!compact" class="grid opts" :class="{ off: !s.bySource }">
         <div v-for="src in store.sources" :key="src.id" class="card card-quiet src-row">
-          <strong dir="auto">{{ fill(naming.sourceManual, { source: src.name }) }}</strong>
+          <strong dir="auto">{{ plain(fill(naming.sourceManual, { source: src.name })) }}</strong>
           <label class="xxd-choice tight">
             <input class="xxd-check" v-model="s.sourceAuto[src.id]" type="checkbox" :disabled="!s.bySource" />
-            <span class="muted">{{ t('strategy.sourceAuto', { name: fill(naming.sourceAuto, { source: src.name }) }) }}</span>
+            <span class="muted">{{ t('strategy.sourceAuto', { name: plain(fill(naming.sourceAuto, { source: src.name })) }) }}</span>
           </label>
         </div>
         <p v-if="!store.sources.length" class="muted">{{ t('strategy.emptySources') }}</p>

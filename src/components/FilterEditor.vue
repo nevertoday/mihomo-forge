@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import Icon from '@/components/Icon.vue'
 import { computed, reactive, ref } from 'vue'
 import { compileFilter, matchesFilter, parseTerms } from '@/core/strategies'
@@ -130,7 +131,7 @@ function summary(f: FilterStrategy): string {
         </thead>
         <tbody>
           <tr v-for="f in list" :key="f.id" :class="{ empty: !builtByRef.get(`filter:${f.id}`) }">
-            <td dir="auto"><strong>{{ f.name }}</strong></td>
+            <td dir="auto"><strong>{{ plain(f.name) }}</strong></td>
             <td class="muted" dir="auto">{{ summary(f) }}</td>
             <td><span class="xxd-badge">{{ modeLabel(f.mode) }}</span></td>
             <td class="num">{{ builtByRef.get(`filter:${f.id}`)?.nodeCount ?? 0 }}</td>
@@ -169,7 +170,7 @@ function summary(f: FilterStrategy): string {
           <span class="xxd-label">{{ t('filter.region') }}</span>
           <span class="xxd-select"><select v-model="draft.regionId" >
             <option value="">{{ t('filter.anyRegion') }}</option>
-            <option v-for="r in store.settings.regions" :key="r.id" :value="r.id">{{ r.icon }} {{ regionName(r) }}</option>
+            <option v-for="r in store.settings.regions" :key="r.id" :value="r.id">{{ regionName(r) }}</option>
           </select></span>
         </label>
         <label class="xxd-field">
@@ -222,7 +223,7 @@ function summary(f: FilterStrategy): string {
         <button type="submit" class="xxd-btn" data-variant="primary" :disabled="!matches.length">{{ editing ? t('filter.save') : t('filter.create') }}</button>
       </div>
     </form>
-    <button v-else type="button" class="xxd-btn add" :disabled="!store.sources.length" @click="open()"><Icon name="Plus" :size="16" /><span>{{ t('filter.add') }}</span></button>
+    <button v-else type="button" class="xxd-btn add" data-size="sm" :disabled="!store.sources.length" @click="open()"><Icon name="Plus" :size="16" /><span>{{ t('filter.add') }}</span></button>
   </section>
 </template>
 

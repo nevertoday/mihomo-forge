@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
 import { currentSetting, editableSetting, optionName, strategyOptionGroups } from '@/app/business'
@@ -47,7 +48,7 @@ function reset() {
   <article class="detail">
     <header class="detail-head">
       <p class="eyebrow">{{ moduleLabel }}{{ service.optional ? ` · ${t('service.optional')}` : '' }}</p>
-      <h2 class="detail-title">{{ service.icon }} {{ serviceName(service) }}</h2>
+      <h2 class="detail-title">{{ serviceName(service) }}</h2>
       <p v-if="description" class="section-note">{{ description }}</p>
       <p v-if="!enabled" class="xxd-banner" data-tone="warning">{{ t('service.notEnabled') }}</p>
     </header>
@@ -61,9 +62,9 @@ function reset() {
           <div class="xxd-field">
             <span class="xxd-label">{{ t('service.defaultLabel') }}</span>
             <span class="xxd-select"><select  :value="setting.defaultRef" @change="setDefault(($event.target as HTMLSelectElement).value)">
-              <option v-for="ref in setting.candidates" :key="ref" :value="ref">{{ optionName(ref, store.build) }}</option>
+              <option v-for="ref in setting.candidates" :key="ref" :value="ref">{{ plain(optionName(ref, store.build)) }}</option>
             </select></span>
-            <small class="xxd-help">{{ t('service.defaultHint', { group: serviceGroupName(service, store.settings.outputLocale) }) }}</small>
+            <small class="xxd-help">{{ t('service.defaultHint', { group: plain(serviceGroupName(service, store.settings.outputLocale)) }) }}</small>
           </div>
 
           <div class="candidates">
@@ -76,7 +77,7 @@ function reset() {
               <legend>{{ g.label }}</legend>
               <label v-for="o in g.options" :key="o.ref" class="xxd-choice">
                 <input class="xxd-check" type="checkbox" :checked="checked.has(o.ref)" @change="toggle(o.ref)" />
-                <span class="check-label"><strong dir="auto">{{ o.name }}</strong><small>{{ o.pool }}</small></span>
+                <span class="check-label"><strong dir="auto">{{ plain(o.name) }}</strong><small>{{ o.pool }}</small></span>
               </label>
             </fieldset>
             <p v-if="!groups.some((g) => g.id !== 'general')" class="muted">{{ t('service.noStrategies') }}</p>

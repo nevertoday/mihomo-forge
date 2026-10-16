@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { plain } from '@/utils/plain'
 import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
 import { go } from '@/app/nav'
@@ -56,8 +57,8 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
         </p>
       </div>
       <div class="row">
-        <button type="button" class="xxd-btn" @click="emit('wizard')">{{ t('overview.rerunWizard') }}</button>
-        <button type="button" class="xxd-btn" data-variant="primary" @click="go('build')"><Icon name="Download" :size="16" /><span>{{ t('overview.rebuild') }}</span></button>
+        <button type="button" class="xxd-btn" data-variant="ghost" @click="emit('wizard')"><Icon name="WandSparkles" :size="16" /><span>{{ t('overview.rerunWizard') }}</span></button>
+        <button type="button" class="xxd-btn" @click="go('build')"><span>{{ t('overview.rebuild') }}</span><Icon name="ArrowRight" :size="16" class="dir-icon" /></button>
       </div>
     </header>
 
@@ -87,7 +88,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <section v-if="store.sources.length" class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('overview.sourcesTitle') }}</h2>
-        <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="go('sources')"><span>{{ t('overview.manageSources') }}</span><Icon name="ArrowRight" class="dir-icon" /></button>
+        <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="go('sources')"><span>{{ t('overview.manageSources') }}</span><Icon name="ArrowRight" :size="16" class="dir-icon" /></button>
       </div>
       <div class="grid grid-cards">
         <SourceCard v-for="(s, i) in store.sources" :key="s.id" :source="s" :index="i" :total="store.sources.length" :actions="false" />
@@ -97,7 +98,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <section class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('overview.businessTitle') }}</h2>
-        <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="go('rules')"><span>{{ t('overview.adjust') }}</span><Icon name="ArrowRight" class="dir-icon" /></button>
+        <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="go('rules')"><span>{{ t('overview.adjust') }}</span><Icon name="ArrowRight" :size="16" class="dir-icon" /></button>
       </div>
       <div class="xxd-table-wrap">
         <table class="xxd-table">
@@ -106,10 +107,10 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
           </thead>
           <tbody>
             <tr v-for="x in b.business" :key="x.service.id">
-              <td><strong><bdi>{{ x.group.name }}</bdi></strong></td>
-              <td><bdi>{{ x.group.proxies[0] }}</bdi></td>
+              <td><strong><bdi>{{ plain(x.group.name) }}</bdi></strong></td>
+              <td><bdi>{{ plain(x.group.proxies[0]) }}</bdi></td>
               <td class="muted">
-                <template v-for="(p, i) in x.group.proxies.slice(1)" :key="p"><template v-if="i"> / </template><bdi>{{ p }}</bdi></template>
+                <template v-for="(p, i) in x.group.proxies.slice(1)" :key="p"><template v-if="i"> / </template><bdi>{{ plain(p) }}</bdi></template>
               </td>
             </tr>
           </tbody>
@@ -128,7 +129,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
 .start-steps li { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body); }
 .start-steps .n { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: var(--r-xs); background: var(--wash-strong); font-size: var(--text-xs); line-height: 1; }
 .start-wizard { justify-self: start; }
-.update { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-5); align-items: center; padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); }
+.update { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-5); align-items: center; }
 .stats { --stat-min: 140px; }
 .xxd-stat.bad .xxd-stat__value { color: var(--danger); }
 @media (max-width: 640px) { .start-steps, .update { grid-template-columns: minmax(0, 1fr); } }
