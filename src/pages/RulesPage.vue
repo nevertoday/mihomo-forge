@@ -85,7 +85,7 @@ function toggle(service: RuleService) {
 
 <style scoped>
 .services-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 28px; align-items: start; }
-.service-list { position: sticky; top: calc(var(--topbar-height) + 16px); max-height: calc(100dvh - var(--topbar-height) - 40px); overflow: auto; border: 1px solid var(--line); background: var(--panel); padding: 12px 0; }
+.service-list { position: sticky; top: 16px; max-height: calc(100dvh - var(--topbar-height) - 32px); overflow: auto; border: 1px solid var(--line); background: var(--panel); padding: 12px 0; }
 .svc-section { padding: 0 8px 10px; }
 .svc-section .eyebrow { margin: 6px 8px 4px; }
 .svc { display: flex; align-items: center; gap: 6px; padding-inline-end: 6px; border-inline-start: 2px solid transparent; }

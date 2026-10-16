@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, Eye, FileUp, Pencil, Trash2 } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, nextTick, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
+import { askConfirm } from '@/app/confirm'
 import { regionName, t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
 import type { Source } from '@/types'
@@ -56,8 +57,8 @@ async function replace(list: FileList | null) {
   if (fileInput.value) fileInput.value.value = ''
 }
 
-function remove() {
-  if (confirm(t('sourceCard.confirmRemove', { name: props.source.name }))) store.removeSource(props.source.id)
+async function remove() {
+  if (await askConfirm(t('sourceCard.confirmRemove', { name: props.source.name }), t('confirm.delete'))) store.removeSource(props.source.id)
 }
 </script>
 
@@ -67,15 +68,15 @@ function remove() {
       <div class="sc-title">
         <template v-if="!editing">
           <h3 dir="auto">{{ source.name }}</h3>
-          <button v-if="actions" type="button" class="icon-btn sm" :aria-label="t('sourceCard.rename')" @click="startRename"><Pencil /></button>
+          <button v-if="actions" type="button" class="icon-btn sm" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil"  /></button>
         </template>
         <form v-else class="rename" @submit.prevent="commitRename">
           <input ref="nameInput" v-model="draft" class="input" maxlength="32" dir="auto" :aria-label="t('sourceCard.nameLabel')" @keydown.esc="editing = false" @blur="commitRename" />
         </form>
       </div>
       <div v-if="actions && total > 1" class="row order">
-        <button type="button" class="icon-btn sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><ArrowUp /></button>
-        <button type="button" class="icon-btn sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><ArrowDown /></button>
+        <button type="button" class="icon-btn sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><Icon name="ArrowUp"  /></button>
+        <button type="button" class="icon-btn sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><Icon name="ArrowDown"  /></button>
       </div>
     </header>
     <p v-if="error" class="sc-error">{{ error }}</p>
@@ -94,10 +95,10 @@ function remove() {
     </template>
 
     <footer v-if="actions" class="sc-actions">
-      <button type="button" class="btn btn-sm" :disabled="waiting" @click="emit('view', source)"><Eye />{{ t('sourceCard.view') }}</button>
-      <button type="button" class="btn btn-sm" @click="fileInput?.click()"><FileUp />{{ t('sourceCard.replace') }}</button>
+      <button type="button" class="btn btn-sm" :disabled="waiting" @click="emit('view', source)"><Icon name="Eye"  />{{ t('sourceCard.view') }}</button>
+      <button type="button" class="btn btn-sm" @click="fileInput?.click()"><Icon name="FileUp"  />{{ t('sourceCard.replace') }}</button>
       <span class="spacer"></span>
-      <button type="button" class="icon-btn sm danger" :aria-label="t('sourceCard.remove')" @click="remove"><Trash2 /></button>
+      <button type="button" class="icon-btn sm danger" :aria-label="t('sourceCard.remove')" @click="remove"><Icon name="Trash"  /></button>
       <input ref="fileInput" type="file" accept=".yaml,.yml,.txt" hidden @change="replace(($event.target as HTMLInputElement).files)" />
     </footer>
   </article>

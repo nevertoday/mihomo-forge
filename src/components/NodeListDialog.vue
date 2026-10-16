@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Search, X } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
 import { regionName, t, tDynamic } from '@/i18n'
@@ -53,12 +53,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
     <section class="dialog dialog-wide" role="dialog" aria-modal="true" :aria-label="t('nodeList.title', { name: source.name })">
       <header class="dialog-head">
         <h2>{{ t('nodeList.title', { name: source.name }) }} <span class="muted">· {{ t('count.nodes', { n: source.nodes.length }) }}</span></h2>
-        <button type="button" class="icon-btn" :aria-label="t('common.close')" @click="emit('close')"><X /></button>
+        <button type="button" class="icon-btn" :aria-label="t('common.close')" @click="emit('close')"><Icon name="X"  /></button>
       </header>
       <div class="dialog-body stack">
         <div class="row">
           <label class="search">
-            <Search aria-hidden="true" />
+            <Icon name="Search" aria-hidden="true" />
             <input v-model="query" class="input" type="search" :placeholder="t('nodeList.search')" />
           </label>
           <label class="check"><input v-model="onlyIssues" type="checkbox" /><span>{{ t('nodeList.onlyIssues') }}</span></label>

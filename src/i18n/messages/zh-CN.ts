@@ -6,7 +6,7 @@
 const zhCN = {
   app: {
     description: '隐私优先、浏览器本地运行的 Mihomo / OpenClash 配置工作台。',
-    privacy: '🔒 所有节点配置仅在当前浏览器中解析和生成，不上传服务器。',
+    privacy: '所有节点配置仅在当前浏览器中解析和生成，不上传服务器。',
     dropVeil: '松开以导入 YAML 节点文件',
   },
   nav: {
@@ -19,6 +19,8 @@ const zhCN = {
     rules: '网站分流',
     base: '高级设置',
     build: '下载配置',
+    collapse: '收起侧边导航',
+    expand: '展开侧边导航',
   },
   topbar: {
     projectName: '项目名称',
@@ -311,7 +313,7 @@ const zhCN = {
     note: '导出 mihomo-forge-project.json 可在其他浏览器恢复全部设置。默认不包含节点凭证，恢复后重新拖入 YAML 即可。',
     include: '在项目文件中包含节点内容',
     includeHint: '会包含 server、uuid、password 等敏感信息，请勿分享该文件。',
-    includeWarn: '⚠️ 导出的文件将包含全部节点凭证。',
+    includeWarn: '导出的文件将包含全部节点凭证。',
     export: '导出项目',
     import: '导入项目',
     clear: '清除本地数据',
@@ -493,6 +495,17 @@ const zhCN = {
     sumExclude: '排除 {terms}',
     sumAll: '全部节点',
     sumSep: '；',
+  },
+  footer: {
+    label: '页脚导航',
+    guide: '使用说明',
+    issues: '反馈问题',
+    privacy: '隐私说明',
+    license: 'MIT 开源',
+  },
+  confirm: {
+    delete: '删除',
+    clear: '清除',
   },
 }
 

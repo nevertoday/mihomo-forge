@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
 import { fill, NAMING, regionLabel } from '@/core/naming'
@@ -99,7 +99,7 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
             <td>{{ regionOf(c.regionId)?.icon }} {{ regionOf(c.regionId) ? regionName(regionOf(c.regionId)!) : '' }}</td>
             <td><span class="chip">{{ modeLabel(c.mode) }}</span></td>
             <td class="num">{{ builtByRef.get(`composite:${c.id}`)?.nodeCount ?? 0 }}</td>
-            <td class="end"><button type="button" class="icon-btn" :aria-label="t('composite.remove')" @click="remove(c.id)"><Trash2 /></button></td>
+            <td class="end"><button type="button" class="icon-btn" :aria-label="t('composite.remove')" @click="remove(c.id)"><Icon name="Trash"  /></button></td>
           </tr>
         </tbody>
       </table>
@@ -131,11 +131,11 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
         <input v-model="displayName" class="input" dir="auto" maxlength="40" :placeholder="t('composite.namePlaceholder', { example })" />
       </label>
       <div class="row creator-actions">
-        <button type="button" class="btn" @click="open = false">{{ t('common.cancel') }}</button>
+        <button type="button" class="btn btn-cancel" @click="open = false">{{ t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary" :disabled="!sourceId || !regionId">{{ t('composite.create') }}</button>
       </div>
     </form>
-    <button v-else type="button" class="btn add" :disabled="!store.sources.length" @click="open = true"><Plus />{{ t('composite.add') }}</button>
+    <button v-else type="button" class="btn add" :disabled="!store.sources.length" @click="open = true"><Icon name="Plus"  />{{ t('composite.add') }}</button>
   </section>
 </template>
 

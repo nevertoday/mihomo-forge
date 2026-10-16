@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import AppFooter from '@/components/AppFooter.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import NoticeRegion from '@/components/NoticeRegion.vue'
 import ReplaceDialog from '@/components/ReplaceDialog.vue'
-import ToastStack from '@/components/ToastStack.vue'
 import Wizard from '@/components/Wizard.vue'
 import { t } from '@/i18n'
 import BasePage from '@/pages/BasePage.vue'
@@ -13,10 +15,9 @@ import StrategiesPage from '@/pages/StrategiesPage.vue'
 import { useProjectStore } from '@/stores/project'
 import AppRail from './AppRail.vue'
 import AppTopbar from './AppTopbar.vue'
-import { currentView, go } from './nav'
+import { currentView, go, wizardOpen as wizard } from './nav'
 
 const store = useProjectStore()
-const wizard = ref(false)
 const dragging = ref(false)
 
 const PAGES = {
@@ -35,7 +36,6 @@ onMounted(async () => {
 })
 
 function finishWizard() {
-  wizard.value = false
   go('overview')
 }
 
@@ -83,20 +83,44 @@ onBeforeUnmount(() => {
   <AppRail />
   <div class="shell">
     <AppTopbar />
-    <main v-if="store.ready">
-      <Wizard v-if="wizard" @finish="finishWizard" />
-      <component :is="PAGES[currentView]" v-else @wizard="wizard = true" />
+    <NoticeRegion />
+    <!-- <main> is the only vertical scroller; the body never scrolls (reference layout rule). -->
+    <main id="content">
+      <template v-if="store.ready">
+        <Wizard v-if="wizard" @finish="finishWizard" />
+        <component :is="PAGES[currentView]" v-else @wizard="wizard = true" />
+      </template>
+      <AppFooter v-if="!wizard" />
     </main>
   </div>
   <ReplaceDialog />
-  <ToastStack />
+  <ConfirmDialog />
   <div v-if="dragging" class="drop-veil" aria-hidden="true">
     <p>{{ t('app.dropVeil') }}</p>
   </div>
 </template>
 
 <style scoped>
-.shell { min-height: 100dvh; padding-inline-start: var(--rail-width); }
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding-inline-start: var(--rail-width);
+  transition: padding-inline-start 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+@media (max-width: 700px) {
+  .shell { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) { .shell { transition: none; } }
 .drop-veil {
   position: fixed;
   inset: 0;

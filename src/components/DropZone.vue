@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileUp } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { ref } from 'vue'
 import { t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
@@ -41,7 +41,7 @@ function onDrop(e: DragEvent) {
     @dragleave.prevent="over = false"
     @drop.prevent="onDrop"
   >
-    <FileUp class="dz-icon" aria-hidden="true" />
+    <Icon name="FileUp" class="dz-icon" aria-hidden="true" />
     <div class="dz-copy">
       <strong>{{ busy ? t('dropzone.busy') : t('dropzone.title') }}</strong>
       <span v-if="!compact">{{ t('dropzone.hint') }}</span>

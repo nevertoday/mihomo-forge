@@ -4,7 +4,7 @@ import type { SourceMessages } from './zh-CN'
 const ja: MessageTree<SourceMessages> = {
   app: {
     description: 'プライバシー重視・ブラウザ完結型の Mihomo / OpenClash 設定ワークベンチ。',
-    privacy: '🔒 ノード設定はこのブラウザ内でのみ解析・生成され、サーバーには一切送信されません。',
+    privacy: 'ノード設定はこのブラウザ内でのみ解析・生成され、サーバーには一切送信されません。',
     dropVeil: 'ドロップして YAML ノードファイルを読み込む',
   },
   nav: {
@@ -17,6 +17,8 @@ const ja: MessageTree<SourceMessages> = {
     rules: 'サイト別ルート',
     base: '詳細設定',
     build: 'ダウンロード',
+    collapse: 'サイドバーを閉じる',
+    expand: 'サイドバーを開く',
   },
   topbar: {
     projectName: 'プロジェクト名',
@@ -309,7 +311,7 @@ const ja: MessageTree<SourceMessages> = {
     note: 'mihomo-forge-project.json を書き出すと、別のブラウザで全設定を復元できます。ノードの認証情報はデフォルトで含まれないので、復元後に YAML を再度ドロップしてください。',
     include: 'プロジェクトファイルにノード内容を含める',
     includeHint: 'server・uuid・password などの機密情報が含まれます。このファイルは共有しないでください。',
-    includeWarn: '⚠️ 書き出すファイルにすべてのノード認証情報が含まれます。',
+    includeWarn: '書き出すファイルにすべてのノード認証情報が含まれます。',
     export: 'プロジェクトを書き出す',
     import: 'プロジェクトを読み込む',
     clear: 'ローカルデータを消去',
@@ -491,6 +493,17 @@ const ja: MessageTree<SourceMessages> = {
     sumExclude: '{terms} を除く',
     sumAll: 'すべてのノード',
     sumSep: '、',
+  },
+  footer: {
+    label: 'フッター',
+    guide: '使い方',
+    issues: '問題を報告',
+    privacy: 'プライバシー',
+    license: 'MIT ライセンス',
+  },
+  confirm: {
+    delete: '削除',
+    clear: '消去',
   },
 }
 

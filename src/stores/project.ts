@@ -55,10 +55,19 @@ export const useProjectStore = defineStore('project', () => {
   const saveState = ref<'idle' | 'saved' | 'error'>('idle')
 
   let toastSeq = 0
+  /**
+   * Notices sit in the page flow under the top bar (reference feedback rule).
+   * Confirmations fade on their own; warnings and errors stay until dismissed.
+   */
   function notify(text: string, tone: Toast['tone'] = 'info') {
     const id = ++toastSeq
-    toasts.value = [...toasts.value, { id, tone, text }]
-    setTimeout(() => (toasts.value = toasts.value.filter((t) => t.id !== id)), tone === 'error' ? 7000 : 3600)
+    // Repeating the same message replaces it instead of stacking duplicates.
+    toasts.value = [...toasts.value.filter((x) => x.text !== text), { id, tone, text }].slice(-3)
+    if (tone === 'success' || tone === 'info') setTimeout(() => dismiss(id), 4000)
+  }
+
+  function dismiss(id: number) {
+    toasts.value = toasts.value.filter((x) => x.id !== id)
   }
 
   function setSources(next: Source[]) {
@@ -243,6 +252,7 @@ export const useProjectStore = defineStore('project', () => {
     nodeCount,
     saveState,
     notify,
+    dismiss,
     importFiles,
     resolvePending,
     renameSourceById,

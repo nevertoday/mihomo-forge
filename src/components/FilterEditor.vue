@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, reactive, ref } from 'vue'
 import { compileFilter, matchesFilter, parseTerms } from '@/core/strategies'
 import { regionName, t } from '@/i18n'
@@ -135,8 +135,8 @@ function summary(f: FilterStrategy): string {
             <td><span class="chip">{{ modeLabel(f.mode) }}</span></td>
             <td class="num">{{ builtByRef.get(`filter:${f.id}`)?.nodeCount ?? 0 }}</td>
             <td class="end">
-              <button type="button" class="icon-btn" :aria-label="t('filter.edit')" @click="open(f)"><Pencil /></button>
-              <button type="button" class="icon-btn" :aria-label="t('filter.remove')" @click="remove(f.id)"><Trash2 /></button>
+              <button type="button" class="icon-btn" :aria-label="t('filter.edit')" @click="open(f)"><Icon name="Pencil"  /></button>
+              <button type="button" class="icon-btn" :aria-label="t('filter.remove')" @click="remove(f.id)"><Icon name="Trash"  /></button>
             </td>
           </tr>
         </tbody>
@@ -215,11 +215,11 @@ function summary(f: FilterStrategy): string {
 
       <p v-if="error" class="bad">{{ error }}</p>
       <div class="row actions">
-        <button type="button" class="btn" @click="editing = null">{{ t('common.cancel') }}</button>
+        <button type="button" class="btn btn-cancel" @click="editing = null">{{ t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary" :disabled="!matches.length">{{ editing ? t('filter.save') : t('filter.create') }}</button>
       </div>
     </form>
-    <button v-else type="button" class="btn add" :disabled="!store.sources.length" @click="open()"><Plus />{{ t('filter.add') }}</button>
+    <button v-else type="button" class="btn add" :disabled="!store.sources.length" @click="open()"><Icon name="Plus"  />{{ t('filter.add') }}</button>
   </section>
 </template>
 

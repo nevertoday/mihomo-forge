@@ -8,7 +8,7 @@ import type { SourceMessages } from './zh-CN'
 const ar: MessageTree<SourceMessages> = {
   app: {
     description: 'منصة لإعداد Mihomo / OpenClash تعمل داخل المتصفح وتضع الخصوصية أولًا.',
-    privacy: '🔒 تُحلَّل إعدادات العُقد وتُولَّد داخل هذا المتصفح فقط، ولا يُرفع أي شيء إلى الخادم.',
+    privacy: 'تُحلَّل إعدادات العُقد وتُولَّد داخل هذا المتصفح فقط، ولا يُرفع أي شيء إلى الخادم.',
     dropVeil: 'أفلِت الملفات لاستيراد عُقد YAML',
   },
   nav: {
@@ -21,6 +21,8 @@ const ar: MessageTree<SourceMessages> = {
     rules: 'توجيه المواقع',
     base: 'إعدادات متقدمة',
     build: 'التنزيل',
+    collapse: 'طيّ الشريط الجانبي',
+    expand: 'توسيع الشريط الجانبي',
   },
   topbar: {
     projectName: 'اسم المشروع',
@@ -313,7 +315,7 @@ const ar: MessageTree<SourceMessages> = {
     note: 'صدِّر mihomo-forge-project.json لاستعادة كل الإعدادات في متصفح آخر. لا تُضمَّن بيانات اعتماد العُقد افتراضيًا، فقط أفلِت ملفات YAML مجددًا.',
     include: 'تضمين محتوى العُقد في ملف المشروع',
     includeHint: 'يتضمن معلومات حساسة مثل server وuuid وpassword. لا تشارك هذا الملف.',
-    includeWarn: '⚠️ سيحتوي الملف المصدَّر على جميع بيانات اعتماد العُقد.',
+    includeWarn: 'سيحتوي الملف المصدَّر على جميع بيانات اعتماد العُقد.',
     export: 'تصدير المشروع',
     import: 'استيراد مشروع',
     clear: 'مسح البيانات المحلية',
@@ -495,6 +497,17 @@ const ar: MessageTree<SourceMessages> = {
     sumExclude: 'يستبعد {terms}',
     sumAll: 'كل العُقد',
     sumSep: '؛ ',
+  },
+  footer: {
+    label: 'تذييل الصفحة',
+    guide: 'دليل الاستخدام',
+    issues: 'الإبلاغ عن مشكلة',
+    privacy: 'الخصوصية',
+    license: 'رخصة MIT',
+  },
+  confirm: {
+    delete: 'حذف',
+    clear: 'مسح',
   },
 }
 

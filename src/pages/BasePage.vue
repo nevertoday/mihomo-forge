@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileUp, RotateCcw } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, ref } from 'vue'
 import { stringify } from 'yaml'
 import { DEFAULT_REGIONS, OTHER_REGION_ID } from '@/catalog/regions'
@@ -92,7 +92,7 @@ function resetRegion(id: string) {
 
       <div v-if="base.templateId === 'custom'" class="stack custom">
         <div class="row">
-          <button type="button" class="btn btn-sm" @click="fileInput?.click()"><FileUp />{{ t('basePage.importBase') }}</button>
+          <button type="button" class="btn btn-sm" @click="fileInput?.click()"><Icon name="FileUp"  />{{ t('basePage.importBase') }}</button>
           <button type="button" class="btn btn-sm btn-quiet" @click="startFromTemplate">{{ t('basePage.fromTemplate') }}</button>
           <input ref="fileInput" type="file" accept=".yaml,.yml" hidden @change="importBase(($event.target as HTMLInputElement).files)" />
         </div>
@@ -145,7 +145,7 @@ function resetRegion(id: string) {
             <strong>{{ r.icon }} {{ regionName(r) }}</strong>
             <span class="spacer"></span>
             <label class="prio"><span class="muted">{{ t('basePage.priority') }}</span><input v-model.number="r.priority" class="input num" type="number" /></label>
-            <button type="button" class="icon-btn" :aria-label="t('common.reset')" :title="t('common.reset')" @click="resetRegion(r.id)"><RotateCcw /></button>
+            <button type="button" class="icon-btn" :aria-label="t('common.reset')" :title="t('common.reset')" @click="resetRegion(r.id)"><Icon name="RotateCcw"  /></button>
           </div>
           <textarea class="textarea" dir="ltr" rows="5" spellcheck="false" :value="r.patterns.join('\n')" @change="setPatterns(r.id, ($event.target as HTMLTextAreaElement).value)"></textarea>
           <p v-for="p in r.patterns.filter((p) => bad.has(`${r.id}|${p}`))" :key="p" class="bad">{{ t('basePage.invalidPattern', { pattern: p }) }}</p>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Copy, Download, X } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
@@ -41,9 +41,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   <aside class="sheet" role="dialog" aria-modal="true" :aria-label="t('yaml.label')">
     <header class="dialog-head">
       <h2>config.yaml</h2>
-      <button type="button" class="btn btn-sm" @click="copy"><Copy />{{ t('yaml.copy') }}</button>
-      <button type="button" class="btn btn-sm btn-primary" :disabled="!store.build.ok" @click="store.downloadConfig()"><Download />{{ t('yaml.download') }}</button>
-      <button type="button" class="icon-btn" :aria-label="t('common.close')" @click="emit('close')"><X /></button>
+      <button type="button" class="btn btn-sm" @click="copy"><Icon name="Copy"  />{{ t('yaml.copy') }}</button>
+      <button type="button" class="btn btn-sm btn-primary" :disabled="!store.build.ok" @click="store.downloadConfig()"><Icon name="Download"  />{{ t('yaml.download') }}</button>
+      <button type="button" class="icon-btn" :aria-label="t('common.close')" @click="emit('close')"><Icon name="X"  /></button>
     </header>
     <div class="tabs sheet-tabs" role="tablist">
       <button v-for="tab in (['all', 'base', 'proxy-groups', 'rules', 'rule-providers'] as const)" :key="tab" type="button" role="tab" :aria-selected="section === tab" @click="section = tab">

@@ -4,7 +4,7 @@ import type { SourceMessages } from './zh-CN'
 const en: MessageTree<SourceMessages> = {
   app: {
     description: 'A privacy-first, browser-based Mihomo / OpenClash configuration studio.',
-    privacy: '🔒 Your node configs are parsed and generated only in this browser. Nothing is uploaded.',
+    privacy: 'Your node configs are parsed and generated only in this browser. Nothing is uploaded.',
     dropVeil: 'Drop to import YAML node files',
   },
   nav: {
@@ -17,6 +17,8 @@ const en: MessageTree<SourceMessages> = {
     rules: 'Site routing',
     base: 'Advanced',
     build: 'Download',
+    collapse: 'Collapse sidebar',
+    expand: 'Expand sidebar',
   },
   topbar: {
     projectName: 'Project name',
@@ -321,7 +323,7 @@ const en: MessageTree<SourceMessages> = {
     note: 'Export mihomo-forge-project.json to restore every setting in another browser. Node credentials are excluded by default — just drop the YAML files in again.',
     include: 'Include node contents in the project file',
     includeHint: 'Contains server, uuid, password and other secrets. Do not share this file.',
-    includeWarn: '⚠️ The exported file will contain every node credential.',
+    includeWarn: 'The exported file will contain every node credential.',
     export: 'Export project',
     import: 'Import project',
     clear: 'Clear local data',
@@ -503,6 +505,17 @@ const en: MessageTree<SourceMessages> = {
     sumExclude: 'excludes {terms}',
     sumAll: 'all nodes',
     sumSep: '; ',
+  },
+  footer: {
+    label: 'Footer',
+    guide: 'Guide',
+    issues: 'Report an issue',
+    privacy: 'Privacy',
+    license: 'MIT licensed',
+  },
+  confirm: {
+    delete: 'Delete',
+    clear: 'Clear',
   },
 }
 

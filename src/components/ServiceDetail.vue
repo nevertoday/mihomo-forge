@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RotateCcw } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
 import { currentSetting, editableSetting, optionName, strategyOptionGroups } from '@/app/business'
 import { providerUrl } from '@/catalog/ruleProviders'
@@ -70,7 +70,7 @@ function reset() {
             <div class="row cand-head">
               <strong>{{ t('service.allowed') }}</strong>
               <span class="spacer"></span>
-              <button v-if="customised" type="button" class="btn btn-sm btn-quiet" @click="reset"><RotateCcw />{{ t('common.reset') }}</button>
+              <button v-if="customised" type="button" class="btn btn-sm btn-quiet" @click="reset"><Icon name="RotateCcw"  />{{ t('common.reset') }}</button>
             </div>
             <fieldset v-for="g in groups" :key="g.id" class="cand-group">
               <legend>{{ g.label }}</legend>
@@ -118,6 +118,6 @@ function reset() {
 .rulesets li { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
 .rulesets a { text-decoration: none; font-size: 11.5px; }
 .rulesets a:hover { color: var(--ink); text-decoration: underline; }
-.detail-side { position: sticky; top: calc(var(--topbar-height) + 16px); }
+.detail-side { position: sticky; top: 16px; }
 @media (max-width: 980px) { .detail-grid { grid-template-columns: 1fr; } .detail-side { position: static; } }
 </style>

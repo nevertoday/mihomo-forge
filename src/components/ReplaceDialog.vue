@@ -39,7 +39,7 @@ const preview = (list: string[]) => list.slice(0, 12)
         </div>
       </div>
       <footer class="dialog-foot">
-        <button type="button" class="btn" @click="store.resolvePending('skip')">{{ t('common.cancel') }}</button>
+        <button type="button" class="btn btn-cancel" @click="store.resolvePending('skip')">{{ t('common.cancel') }}</button>
         <button type="button" class="btn" @click="store.resolvePending('add')">{{ t('replace.addAsNew') }}</button>
         <button type="button" class="btn btn-primary" @click="store.resolvePending('replace')">{{ t('replace.confirm', { name: item.existing.name }) }}</button>
       </footer>

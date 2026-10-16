@@ -4,7 +4,7 @@ import type { SourceMessages } from './zh-CN'
 const zhTW: MessageTree<SourceMessages> = {
   app: {
     description: '隱私優先、在瀏覽器本機執行的 Mihomo / OpenClash 設定工作台。',
-    privacy: '🔒 所有節點設定只在目前的瀏覽器中解析與產生，不會上傳到伺服器。',
+    privacy: '所有節點設定只在目前的瀏覽器中解析與產生，不會上傳到伺服器。',
     dropVeil: '放開即可匯入 YAML 節點檔案',
   },
   nav: {
@@ -17,6 +17,8 @@ const zhTW: MessageTree<SourceMessages> = {
     rules: '網站分流',
     base: '進階設定',
     build: '下載設定',
+    collapse: '收合側邊導覽',
+    expand: '展開側邊導覽',
   },
   topbar: {
     projectName: '專案名稱',
@@ -309,7 +311,7 @@ const zhTW: MessageTree<SourceMessages> = {
     note: '匯出 mihomo-forge-project.json 即可在其他瀏覽器還原所有設定。預設不包含節點憑證，還原後重新拖入 YAML 即可。',
     include: '在專案檔中包含節點內容',
     includeHint: '會包含 server、uuid、password 等敏感資訊，請勿分享此檔案。',
-    includeWarn: '⚠️ 匯出的檔案將包含所有節點憑證。',
+    includeWarn: '匯出的檔案將包含所有節點憑證。',
     export: '匯出專案',
     import: '匯入專案',
     clear: '清除本機資料',
@@ -491,6 +493,17 @@ const zhTW: MessageTree<SourceMessages> = {
     sumExclude: '排除 {terms}',
     sumAll: '全部節點',
     sumSep: '；',
+  },
+  footer: {
+    label: '頁尾導覽',
+    guide: '使用說明',
+    issues: '回報問題',
+    privacy: '隱私說明',
+    license: 'MIT 開源',
+  },
+  confirm: {
+    delete: '刪除',
+    clear: '清除',
   },
 }
 

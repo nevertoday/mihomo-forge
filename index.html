@@ -5,22 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description" content="隐私优先、浏览器本地运行的 Mihomo / OpenClash 配置工作台：把多个订阅 YAML 快照编译成一个完整 config.yaml。">
     <title>Mihomo Forge</title>
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="./favicon.svg?v=anvil-tile" type="image/svg+xml">
     <script>
-      // Apply the theme before first paint to avoid a flash.
+      // Apply theme and rail width before first paint to avoid a flash.
       (() => {
         let pref = 'system'
         try { pref = localStorage.getItem('mihomo-forge-theme') || 'system' } catch {}
         const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        let rail = 'expanded'
+        try { if (localStorage.getItem('mihomo-forge-rail') === 'collapsed') rail = 'collapsed' } catch {}
+        document.documentElement.dataset.rail = rail
       })()
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&family=Noto+Serif+SC:wght@600;700;900&display=swap" media="print" onload="this.media='all'">
+    <style>
+      .boot { --b: #fcfcfc; --r: #f9f9f9; --l: #e7e7ea; --s: #ededed; position: fixed; inset: 0; display: flex; background: var(--b); }
+      :root[data-theme="dark"] .boot { --b: #171612; --r: #1b1a16; --l: #34322b; --s: #2a2822; }
+      .boot-rail { flex: none; width: 188px; background: var(--r); border-right: 1px solid var(--l); }
+      :root[data-rail="collapsed"] .boot-rail { width: 56px; }
+      .boot-main { flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 0 40px; }
+      .boot-top { height: 56px; margin: 0 -40px 22px; border-bottom: 1px solid var(--l); }
+      .boot-line, .boot-block { display: block; height: 14px; background: var(--s); animation: boot-pulse 1.4s ease-in-out infinite; }
+      .boot-line.tall { height: 34px; }
+      .boot-block { height: 180px; margin-top: 18px; }
+      .w20 { width: 20%; } .w40 { width: 40%; } .w60 { width: 60%; }
+      .boot-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      @keyframes boot-pulse { 50% { opacity: 0.55; } }
+      @media (max-width: 700px) { .boot-rail { display: none; } .boot-main { padding: 0 16px; } .boot-top { margin: 0 -16px 22px; } }
+      @media (prefers-reduced-motion: reduce) { .boot-line, .boot-block { animation: none; } }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <!-- Boot skeleton: previews the final layout until the app mounts (never a blank page). -->
+    <div id="app">
+      <div class="boot" aria-busy="true">
+        <span class="boot-rail"></span>
+        <div class="boot-main">
+          <span class="boot-top"></span>
+          <span class="boot-line w20"></span>
+          <span class="boot-line w40 tall"></span>
+          <span class="boot-line w60"></span>
+          <span class="boot-block"></span>
+        </div>
+        <span class="boot-status">Loading…</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

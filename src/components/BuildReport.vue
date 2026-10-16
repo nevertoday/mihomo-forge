@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertTriangle, Check, Info, XCircle } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
 import { SERVICE_BY_ID } from '@/catalog/services'
 import { issueText, t } from '@/i18n'
@@ -38,7 +38,7 @@ const issues = computed(() => [...b.value.issues].sort((x, y) => ORDER.indexOf(x
   <div class="report">
     <ul class="checklist">
       <li v-for="c in checklist" :key="c.text" :class="{ bad: !c.ok }">
-        <Check v-if="c.ok" aria-hidden="true" /><XCircle v-else aria-hidden="true" />
+        <Icon name="Check" v-if="c.ok" aria-hidden="true" /><Icon name="CircleX" v-else aria-hidden="true" />
         <span>{{ c.text }}</span>
       </li>
     </ul>
@@ -46,9 +46,9 @@ const issues = computed(() => [...b.value.issues].sort((x, y) => ORDER.indexOf(x
 
     <ul v-if="issues.length" class="issues">
       <li v-for="(i, idx) in issues" :key="idx" class="notice" :class="{ 'notice-error': i.level === 'ERROR', 'notice-warning': i.level === 'WARNING', 'notice-plain': i.level === 'INFO' }">
-        <XCircle v-if="i.level === 'ERROR'" aria-hidden="true" />
-        <AlertTriangle v-else-if="i.level === 'WARNING'" aria-hidden="true" />
-        <Info v-else aria-hidden="true" />
+        <Icon name="CircleX" v-if="i.level === 'ERROR'" aria-hidden="true" />
+        <Icon name="TriangleAlert" v-else-if="i.level === 'WARNING'" aria-hidden="true" />
+        <Icon name="Info" v-else aria-hidden="true" />
         <span><b>{{ t(`report.${i.level}`) }}</b> {{ issueText(i, SERVICE_BY_ID) }}</span>
       </li>
     </ul>

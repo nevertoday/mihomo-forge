@@ -7,7 +7,7 @@
   color-scheme: light;
   --bg: #fcfcfc;
   --paper: #fcfcfc;
-  --panel: #ffffff;
+  --panel: #fcfcfc;
   --ink: #111111;
   --muted: #777777;
   --muted-2: #9a968d;
@@ -46,7 +46,11 @@
   --dock-shadow: 0 16px 44px color-mix(in srgb, var(--black) 14%, transparent);
 
   --rail-width: 56px;
-  --topbar-height: 64px;
+  --rail-active-track: #ededed;
+  --topbar-height: 56px;
+  --navigation-control-size: 40px;
+  --navigation-font-size: 13px;
+  --navigation-font-weight: 500;
   --gutter: clamp(16px, 3vw, 40px);
   --content: 1180px;
 
@@ -84,6 +88,7 @@
   --line: #34322b;
   --line-strong: #4c483f;
   --rail-bg: #1b1a16;
+  --rail-active-track: #303030;
   --wash: #2a2822;
   --active-wash: rgba(255, 255, 255, 0.08);
   --active-line: rgba(255, 255, 255, 0.18);
@@ -117,7 +122,8 @@ html {
 
 body {
   margin: 0;
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   min-width: 320px;
   color: var(--ink);
   background: var(--bg);
@@ -151,7 +157,7 @@ a { color: inherit; }
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 /* Letter-spacing breaks Arabic joining; CJK has no case. */
@@ -181,7 +187,7 @@ code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
 .page {
   width: min(100%, var(--content));
   margin: 0 auto;
-  padding: 36px var(--gutter) 140px;
+  padding: 36px var(--gutter) 56px;
 }
 .page-head {
   display: flex;
@@ -255,6 +261,33 @@ code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
 .btn-danger { color: var(--notice-error-ink); border-color: var(--notice-error-border); }
 .btn-danger:hover:not(:disabled) { color: var(--white); background: var(--notice-error-ink); border-color: var(--notice-error-ink); }
 .btn-sm { min-height: 30px; padding: 0 10px; font-size: 13px; }
+/* Dialog dismissal is auxiliary: quiet, content-sized, before the primary (reference: Dialog Action Hierarchy). */
+.btn-cancel {
+  min-height: 40px;
+  padding: 0 12px;
+  border-color: transparent;
+  color: var(--muted);
+  background: transparent;
+  font-weight: 650;
+}
+.btn-cancel:hover:not(:disabled), .btn-cancel:focus-visible { border-color: transparent; color: var(--ink); background: var(--wash); }
+.btn-danger-solid { border-color: var(--notice-error-ink); background: var(--notice-error-ink); color: var(--white); }
+.btn-danger-solid:hover:not(:disabled) { border-color: var(--notice-error-ink); background: color-mix(in srgb, var(--notice-error-ink) 85%, var(--black)); color: var(--white); }
+/* Bordered square tool button used in the top bar, like the reference header. */
+.header-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--navigation-control-size);
+  height: var(--navigation-control-size);
+  padding: 0;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: var(--paper);
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+.header-icon:hover, .header-icon:focus-visible { color: var(--white); border-color: var(--black); background: var(--black); outline: none; }
+:root[data-theme="dark"] .header-icon:hover, :root[data-theme="dark"] .header-icon:focus-visible { color: var(--ink); border-color: var(--line-strong); background: var(--solid-hover-bg); }
 .btn-lg { min-height: 46px; padding: 0 20px; font-size: 15px; }
 .icon-btn {
   display: inline-grid;
@@ -310,33 +343,12 @@ code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
 }
 .check:hover { background: var(--active-wash); }
 .check input {
-  appearance: none;
   flex: none;
-  width: 16px;
-  height: 16px;
-  margin: 3px 0 0;
-  border: 1.5px solid var(--line-strong);
-  background: var(--panel);
-  display: grid;
-  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--ink);
   cursor: pointer;
-}
-.check input[type="radio"] { border-radius: 50%; }
-.check input:checked { border-color: var(--ink); background: var(--ink); }
-.check input[type="checkbox"]:checked::after {
-  content: "";
-  width: 8px;
-  height: 4px;
-  border-left: 2px solid var(--paper);
-  border-bottom: 2px solid var(--paper);
-  transform: translateY(-1px) rotate(-45deg);
-}
-.check input[type="radio"]:checked::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--paper);
 }
 .check input:disabled { opacity: 0.4; }
 .check-label { display: grid; gap: 1px; min-width: 0; }
@@ -344,28 +356,9 @@ code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
 .check-label small { color: var(--muted); font-size: 12px; line-height: 1.45; }
 .check.is-disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Segmented control (preset picker, tabs) */
-.segmented {
-  display: inline-flex;
-  flex-wrap: wrap;
-  border: 1px solid var(--line);
-  background: var(--panel);
-}
-.segmented button {
-  min-height: 38px;
-  padding: 0 16px;
-  border: 0;
-  border-inline-end: 1px solid var(--line);
-  background: transparent;
-  color: var(--muted);
-  font-weight: 700;
-}
-.segmented button:last-child { border-inline-end: 0; }
-.segmented button:hover { color: var(--ink); background: var(--active-wash); }
-.segmented button[aria-pressed="true"] { color: var(--paper); background: var(--ink); }
 
 /* Underline tabs, like the topic nav */
-.tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--line); }
 .tabs button {
   position: relative;
   flex: none;
@@ -374,7 +367,8 @@ code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-weight: 700;
+  font-size: var(--navigation-font-size);
+  font-weight: var(--navigation-font-weight);
   white-space: nowrap;
 }
 .tabs button:hover { color: var(--ink); background: var(--active-wash); }
@@ -535,14 +529,14 @@ code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
   text-align: center;
 }
 
-/* Wide screens show navigation labels next to the icons. */
-@media (min-width: 1200px) {
-  :root { --rail-width: 188px; }
+/* The rail is expanded with labels unless the viewer collapsed it (remembered per browser). */
+@media (min-width: 701px) {
+  :root[data-rail="expanded"] { --rail-width: 188px; }
 }
 
-@media (max-width: 760px) {
-  :root { --rail-width: 0px; --topbar-height: 56px; }
-  .page { padding-top: 24px; padding-bottom: 160px; }
+@media (max-width: 700px) {
+  :root { --rail-width: 0px; --navigation-control-size: 44px; }
+  .page { padding-top: 24px; padding-bottom: 40px; }
   .dock { left: 12px; right: 12px; bottom: calc(68px + env(safe-area-inset-bottom)); flex-wrap: wrap; }
   .dock-meta { width: 100%; }
 }

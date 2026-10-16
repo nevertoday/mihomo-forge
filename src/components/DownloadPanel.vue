@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertTriangle, CircleCheck, Download, FileCode2 } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
 import { t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
@@ -14,8 +14,8 @@ const errors = computed(() => store.build.issues.filter((i) => i.level === 'ERRO
 <template>
   <section class="download" :class="{ bad: !store.build.ok }">
     <div class="status">
-      <CircleCheck v-if="store.build.ok" class="ok-icon" aria-hidden="true" />
-      <AlertTriangle v-else class="bad-icon" aria-hidden="true" />
+      <Icon name="CircleCheck" v-if="store.build.ok" class="ok-icon" aria-hidden="true" />
+      <Icon name="TriangleAlert" v-else class="bad-icon" aria-hidden="true" />
       <div>
         <p class="verdict">{{ store.build.ok ? t('report.ok') : t('report.bad') }}</p>
         <p class="meta">
@@ -26,9 +26,9 @@ const errors = computed(() => store.build.issues.filter((i) => i.level === 'ERRO
       </div>
     </div>
     <div class="actions">
-      <button type="button" class="btn btn-quiet" @click="emit('view-yaml')"><FileCode2 />{{ t('buildPage.viewYaml') }}</button>
+      <button type="button" class="btn btn-quiet" @click="emit('view-yaml')"><Icon name="Code"  />{{ t('buildPage.viewYaml') }}</button>
       <button type="button" class="btn btn-primary btn-lg" :disabled="!store.build.ok" @click="store.downloadConfig()">
-        <Download />{{ t('buildPage.download') }}
+        <Icon name="Download"  />{{ t('buildPage.download') }}
       </button>
     </div>
   </section>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, ArrowRight, Check, FileUp, Sparkles } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed, ref } from 'vue'
 import { t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
@@ -39,7 +39,7 @@ async function onProject(list: FileList | null) {
 
 function next() {
   if (step.value < 5) step.value++
-  window.scrollTo({ top: 0 })
+  document.getElementById('content')?.scrollTo({ top: 0 })
 }
 </script>
 
@@ -48,7 +48,7 @@ function next() {
     <ol class="steps" :aria-label="t('wizard.progress')">
       <li v-for="s in STEPS" :key="s.n" :class="{ done: s.n < step, now: s.n === step }" :aria-current="s.n === step ? 'step' : undefined">
         <button type="button" :disabled="s.n > step && !canNext" @click="s.n <= step || canNext ? (step = s.n) : null">
-          <span class="dot num"><Check v-if="s.n < step" />{{ s.n < step ? '' : s.n }}</span>
+          <span class="dot num"><Icon v-if="s.n < step" name="Check" :size="14" />{{ s.n < step ? '' : s.n }}</span>
           <span class="step-title">{{ s.title }}</span>
         </button>
       </li>
@@ -58,7 +58,7 @@ function next() {
       <p class="eyebrow">{{ t('wizard.step', { n: step }) }}</p>
       <h1 class="page-title">{{ current.title }}</h1>
       <p class="page-lede">{{ current.lede }}</p>
-      <p v-if="step === 3 || step === 4" class="keep-default"><Sparkles aria-hidden="true" />{{ t('wizard.keepDefault') }}</p>
+      <p v-if="step === 3 || step === 4" class="keep-default"><Icon name="Sparkles" aria-hidden="true" />{{ t('wizard.keepDefault') }}</p>
     </header>
 
     <div v-if="step === 1" class="stack">
@@ -69,7 +69,7 @@ function next() {
       </div>
       <p class="muted alt">
         {{ t('wizard.haveProject') }}
-        <button type="button" class="link" @click="projectInput?.click()"><FileUp />{{ t('wizard.importProject') }}</button>
+        <button type="button" class="link" @click="projectInput?.click()"><Icon name="FileUp"  />{{ t('wizard.importProject') }}</button>
         <input ref="projectInput" type="file" accept=".json" hidden @change="onProject(($event.target as HTMLInputElement).files)" />
       </p>
     </div>
@@ -101,9 +101,9 @@ function next() {
       </div>
       <span class="spacer"></span>
       <button v-if="step === 1" type="button" class="btn btn-quiet" @click="emit('finish')">{{ t('wizard.skip') }}</button>
-      <button v-if="step > 1" type="button" class="btn btn-quiet" @click="step--"><ArrowLeft class="dir-icon" />{{ t('common.prev') }}</button>
-      <button v-if="step < 5" type="button" class="btn btn-primary" :disabled="!canNext" @click="next">{{ t('common.next') }}<ArrowRight class="dir-icon" /></button>
-      <button v-else type="button" class="btn btn-primary" @click="emit('finish')">{{ t('wizard.enter') }}<ArrowRight class="dir-icon" /></button>
+      <button v-if="step > 1" type="button" class="btn btn-quiet" @click="step--"><Icon name="ArrowLeft" class="dir-icon" />{{ t('common.prev') }}</button>
+      <button v-if="step < 5" type="button" class="btn btn-primary" :disabled="!canNext" @click="next">{{ t('common.next') }}<Icon name="ArrowRight" class="dir-icon" /></button>
+      <button v-else type="button" class="btn btn-primary" @click="emit('finish')">{{ t('wizard.enter') }}<Icon name="ArrowRight" class="dir-icon" /></button>
     </div>
 
     <NodeListDialog v-if="viewing" :source="viewing" @close="viewing = null" />
@@ -112,7 +112,7 @@ function next() {
 </template>
 
 <style scoped>
-.wizard { max-width: 1000px; }
+.wizard { max-width: 1000px; padding-bottom: 140px; }
 .steps { display: grid; grid-template-columns: repeat(5, 1fr); margin: 0 0 32px; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .steps li { position: relative; }
 .steps li.now::before, .steps li.done::before { content: ""; position: absolute; top: -1px; left: 0; right: 0; height: 2px; background: var(--ink); }
@@ -122,7 +122,7 @@ function next() {
 .dot { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border: 1.5px solid currentColor; font-size: 12px; font-weight: 700; }
 .now .dot { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .dot svg { width: 13px; height: 13px; }
-.step-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.step-title { font-size: var(--navigation-font-size); font-weight: var(--navigation-font-weight); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wiz-head { margin-bottom: 24px; }
 .imported { gap: 6px; }
 .alt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
@@ -132,5 +132,5 @@ function next() {
 .keep-default svg { width: 15px; height: 15px; }
 .need-file { color: var(--notice-warning-ink); font-weight: 700; }
 .checks summary { cursor: pointer; font-weight: 700; margin-bottom: 10px; }
-@media (max-width: 760px) { .step-title { display: none; } .steps button { justify-content: center; padding-inline-end: 0; } }
+@media (max-width: 700px) { .step-title { display: none; } .steps button { justify-content: center; padding-inline-end: 0; } }
 </style>

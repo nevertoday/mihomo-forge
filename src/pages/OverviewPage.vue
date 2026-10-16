@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, Download, Wand2 } from 'lucide-vue-next'
+import Icon from '@/components/Icon.vue'
 import { computed } from 'vue'
 import { go } from '@/app/nav'
 import { MODULES } from '@/catalog/services'
@@ -40,7 +40,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <div class="stack">
       <DropZone />
       <PrivacyNote />
-      <button type="button" class="btn start-wizard" @click="emit('wizard')"><Wand2 />{{ t('overview.emptyWizard') }}</button>
+      <button type="button" class="btn start-wizard" @click="emit('wizard')"><Icon name="WandSparkles"  />{{ t('overview.emptyWizard') }}</button>
     </div>
     <section class="section">
       <ProjectFileCard />
@@ -59,7 +59,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
       </div>
       <div class="row">
         <button type="button" class="btn" @click="emit('wizard')">{{ t('overview.rerunWizard') }}</button>
-        <button type="button" class="btn btn-primary" @click="go('build')"><Download />{{ t('overview.rebuild') }}</button>
+        <button type="button" class="btn btn-primary" @click="go('build')"><Icon name="Download"  />{{ t('overview.rebuild') }}</button>
       </div>
     </header>
 
@@ -90,7 +90,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <section v-if="store.sources.length" class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('overview.sourcesTitle') }}</h2>
-        <button type="button" class="btn btn-sm btn-quiet" @click="go('sources')">{{ t('overview.manageSources') }}<ArrowRight class="dir-icon" /></button>
+        <button type="button" class="btn btn-sm btn-quiet" @click="go('sources')">{{ t('overview.manageSources') }}<Icon name="ArrowRight" class="dir-icon" /></button>
       </div>
       <div class="grid grid-cards">
         <SourceCard v-for="(s, i) in store.sources" :key="s.id" :source="s" :index="i" :total="store.sources.length" :actions="false" />
@@ -100,7 +100,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <section class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('overview.businessTitle') }}</h2>
-        <button type="button" class="btn btn-sm btn-quiet" @click="go('rules')">{{ t('overview.adjust') }}<ArrowRight class="dir-icon" /></button>
+        <button type="button" class="btn btn-sm btn-quiet" @click="go('rules')">{{ t('overview.adjust') }}<Icon name="ArrowRight" class="dir-icon" /></button>
       </div>
       <div class="table-wrap">
         <table class="table">
@@ -131,8 +131,8 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
 .start-steps li { display: flex; gap: 10px; align-items: flex-start; padding: 14px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; line-height: 1.55; }
 .start-steps .n { flex: none; display: grid; place-items: center; width: 26px; height: 26px; background: var(--ink); color: var(--paper); }
 .start-wizard { justify-self: start; }
-@media (max-width: 760px) { .start-steps { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .start-steps { grid-template-columns: 1fr; } }
 .update { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 18px; border: 1px solid var(--line); background: var(--panel); }
 .stat.bad strong { color: var(--notice-error-ink); }
-@media (max-width: 760px) { .update { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .update { grid-template-columns: 1fr; } }
 </style>
