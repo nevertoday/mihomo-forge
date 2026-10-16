@@ -55,8 +55,8 @@ const globals = computed(() => [
         <p class="section-note">{{ t('strategy.globalNote') }}</p>
       </header>
       <div class="grid opts">
-        <label v-for="g in globals" :key="g.key" class="check card-check">
-          <input v-model="s[g.key]" type="checkbox" />
+        <label v-for="g in globals" :key="g.key" class="xxd-choice card-check">
+          <input class="xxd-check" v-model="s[g.key]" type="checkbox" />
           <span class="check-label"><strong>{{ g.label }}</strong><small>{{ g.hint }}</small></span>
         </label>
       </div>
@@ -64,8 +64,8 @@ const globals = computed(() => [
 
     <section class="block">
       <header class="block-head">
-        <label class="check head-check">
-          <input v-model="s.byRegion" type="checkbox" />
+        <label class="xxd-choice head-check">
+          <input class="xxd-check" v-model="s.byRegion" type="checkbox" />
           <span class="check-label"><strong class="section-title">{{ t('strategy.regionTitle') }}</strong></span>
         </label>
         <p class="section-note">{{ t('strategy.regionNote') }}</p>
@@ -75,7 +75,7 @@ const globals = computed(() => [
           v-for="r in regions"
           :key="r.id"
           type="button"
-          class="chip chip-toggle"
+          class="xxd-chip"
           :aria-pressed="!!s.enabledRegions[r.id]"
           :disabled="!s.byRegion"
           @click="s.enabledRegions[r.id] = !s.enabledRegions[r.id]"
@@ -83,8 +83,8 @@ const globals = computed(() => [
           {{ r.icon }} {{ regionName(r) }} <span class="num">{{ regionCounts.get(r.id) ?? 0 }}</span>
         </button>
       </div>
-      <div v-else class="table-wrap" :class="{ off: !s.byRegion }">
-        <table class="table">
+      <div v-else class="xxd-table-wrap" :class="{ off: !s.byRegion }">
+        <table class="xxd-table">
           <thead>
             <tr>
               <th>{{ t('strategy.colEnable') }}</th>
@@ -96,18 +96,18 @@ const globals = computed(() => [
           </thead>
           <tbody>
             <tr v-for="r in regions" :key="r.id" :class="{ dim: !s.enabledRegions[r.id] }">
-              <td><label class="check tight"><input v-model="s.enabledRegions[r.id]" type="checkbox" :disabled="!s.byRegion" :aria-label="regionName(r)" /></label></td>
+              <td><label class="xxd-choice tight"><input class="xxd-check" v-model="s.enabledRegions[r.id]" type="checkbox" :disabled="!s.byRegion" :aria-label="regionName(r)" /></label></td>
               <td><strong>{{ r.icon }} {{ regionName(r) }}</strong></td>
               <td class="num">{{ regionCounts.get(r.id) ?? 0 }}</td>
               <td>
-                <label class="check tight">
-                  <input v-model="modes(r.id).manual" type="checkbox" :disabled="!s.byRegion || !s.enabledRegions[r.id]" />
+                <label class="xxd-choice tight">
+                  <input class="xxd-check" v-model="modes(r.id).manual" type="checkbox" :disabled="!s.byRegion || !s.enabledRegions[r.id]" />
                   <span class="muted">{{ outName(naming.regionManual, r) }}</span>
                 </label>
               </td>
               <td>
-                <label class="check tight">
-                  <input v-model="modes(r.id).auto" type="checkbox" :disabled="!s.byRegion || !s.enabledRegions[r.id]" />
+                <label class="xxd-choice tight">
+                  <input class="xxd-check" v-model="modes(r.id).auto" type="checkbox" :disabled="!s.byRegion || !s.enabledRegions[r.id]" />
                   <span class="muted">{{ outName(naming.regionAuto, r) }}</span>
                 </label>
               </td>
@@ -115,15 +115,15 @@ const globals = computed(() => [
           </tbody>
         </table>
       </div>
-      <button v-if="emptyCount && store.build.nodes.length" type="button" class="btn btn-sm btn-quiet toggle-empty" @click="showEmpty = !showEmpty">
+      <button v-if="emptyCount && store.build.nodes.length" type="button" class="xxd-btn toggle-empty" data-size="sm" data-variant="ghost" @click="showEmpty = !showEmpty">
         {{ showEmpty ? t('strategy.hideEmpty') : t('strategy.showEmpty', { n: emptyCount }) }}
       </button>
     </section>
 
     <section class="block">
       <header class="block-head">
-        <label class="check head-check">
-          <input v-model="s.bySource" type="checkbox" />
+        <label class="xxd-choice head-check">
+          <input class="xxd-check" v-model="s.bySource" type="checkbox" />
           <span class="check-label"><strong class="section-title">{{ t('strategy.sourceTitle') }}</strong></span>
         </label>
         <p class="section-note">{{ t('strategy.sourceNote') }}{{ compact ? '' : ' ' + t('strategy.sourceNoteMore') }}</p>
@@ -131,8 +131,8 @@ const globals = computed(() => [
       <div v-if="!compact" class="grid opts" :class="{ off: !s.bySource }">
         <div v-for="src in store.sources" :key="src.id" class="card card-quiet src-row">
           <strong dir="auto">{{ fill(naming.sourceManual, { source: src.name }) }}</strong>
-          <label class="check tight">
-            <input v-model="s.sourceAuto[src.id]" type="checkbox" :disabled="!s.bySource" />
+          <label class="xxd-choice tight">
+            <input class="xxd-check" v-model="s.sourceAuto[src.id]" type="checkbox" :disabled="!s.bySource" />
             <span class="muted">{{ t('strategy.sourceAuto', { name: fill(naming.sourceAuto, { source: src.name }) }) }}</span>
           </label>
         </div>
@@ -143,21 +143,15 @@ const globals = computed(() => [
 </template>
 
 <style scoped>
-.strategy-options { display: grid; gap: 32px; }
-.block { display: grid; gap: 12px; }
-.block-head { display: grid; gap: 2px; }
-.head-check { padding: 0; min-height: 0; align-items: center; }
-.head-check:hover { background: transparent; }
-.head-check input { margin-top: 0; }
-.opts { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
-.card-check { border: 1px solid var(--line); background: var(--panel); padding: 12px; }
-.card-check:has(input:checked) { border-color: var(--ink); }
-.check.tight { padding: 2px 0; min-height: 0; align-items: center; }
-.check.tight:hover { background: transparent; }
-.check.tight input { margin-top: 0; }
+.strategy-options { display: grid; gap: var(--space-8); }
+.block { display: grid; gap: var(--space-3); }
+.block-head { display: grid; gap: var(--space-0-5); }
+.head-check { align-items: center; }
+.opts { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-2); }
+.tight { align-items: center; }
 .off { opacity: 0.45; pointer-events: none; }
 tr.dim td { color: var(--muted); }
-.src-row { display: grid; gap: 6px; padding: 12px; }
-.chip-toggle .num { opacity: 0.7; }
+.src-row { display: grid; gap: var(--space-1-5); padding: var(--space-3); }
+.xxd-chip .num { color: var(--muted); }
 .toggle-empty { justify-self: start; }
 </style>

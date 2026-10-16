@@ -38,32 +38,33 @@ const issues = computed(() => [...b.value.issues].sort((x, y) => ORDER.indexOf(x
   <div class="report">
     <ul class="checklist">
       <li v-for="c in checklist" :key="c.text" :class="{ bad: !c.ok }">
-        <Icon name="Check" v-if="c.ok" aria-hidden="true" /><Icon name="CircleX" v-else aria-hidden="true" />
+        <Icon v-if="c.ok" name="Check" :size="16" /><Icon v-else name="CircleX" :size="16" />
         <span>{{ c.text }}</span>
       </li>
     </ul>
     <p v-if="!hideVerdict" class="verdict" :class="b.ok ? 'ok' : 'bad'">{{ b.ok ? t('report.ok') : t('report.bad') }}</p>
 
     <ul v-if="issues.length" class="issues">
-      <li v-for="(i, idx) in issues" :key="idx" class="notice" :class="{ 'notice-error': i.level === 'ERROR', 'notice-warning': i.level === 'WARNING', 'notice-plain': i.level === 'INFO' }">
-        <Icon name="CircleX" v-if="i.level === 'ERROR'" aria-hidden="true" />
-        <Icon name="TriangleAlert" v-else-if="i.level === 'WARNING'" aria-hidden="true" />
-        <Icon name="Info" v-else aria-hidden="true" />
-        <span><b>{{ t(`report.${i.level}`) }}</b> {{ issueText(i, SERVICE_BY_ID) }}</span>
+      <li v-for="(i, idx) in issues" :key="idx" class="xxd-banner" data-size="sm" :data-tone="i.level === 'ERROR' ? 'danger' : i.level === 'WARNING' ? 'warning' : undefined">
+        <Icon v-if="i.level === 'ERROR'" name="CircleX" :size="16" />
+        <Icon v-else-if="i.level === 'WARNING'" name="TriangleAlert" :size="16" />
+        <Icon v-else name="Info" :size="16" />
+        <p class="xxd-banner__text"><span class="level">{{ t(`report.${i.level}`) }}</span> {{ issueText(i, SERVICE_BY_ID) }}</p>
       </li>
     </ul>
   </div>
 </template>
 
 <style scoped>
-.report { display: grid; gap: 16px; }
-.checklist { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); border-top: 1px solid var(--line); border-inline-start: 1px solid var(--line); }
-.checklist li { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-inline-end: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--panel); font-weight: 600; }
-.checklist svg { width: 16px; height: 16px; flex: none; color: var(--notice-success-ink); }
-.checklist li.bad { color: var(--notice-error-ink); }
-.checklist li.bad svg { color: var(--notice-error-ink); }
-.verdict { margin: 0; font-family: var(--font-title); font-size: 22px; font-weight: 900; }
-.verdict.ok::before { content: "✓ "; color: var(--notice-success-ink); }
-.verdict.bad { color: var(--notice-error-ink); }
-.issues { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.report { display: grid; gap: var(--space-4); }
+/* Results read as a list of marks, not a grid of boxes. */
+.checklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-2) var(--space-4); margin: 0; padding: 0; list-style: none; }
+.checklist li { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); line-height: var(--leading-sm); }
+.checklist :deep(.ui-icon) { flex: none; color: var(--success); }
+.checklist li.bad, .checklist li.bad :deep(.ui-icon) { color: var(--danger); }
+.verdict { margin: 0; font: var(--weight-strong) var(--text-xl) / var(--leading-lg) var(--font-title); }
+.verdict.ok { color: var(--success); }
+.verdict.bad { color: var(--danger); }
+.issues { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.level { font-weight: var(--weight-medium); }
 </style>

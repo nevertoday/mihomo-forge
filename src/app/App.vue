@@ -95,9 +95,7 @@ onBeforeUnmount(() => {
   </div>
   <ReplaceDialog />
   <ConfirmDialog />
-  <div v-if="dragging" class="drop-veil" aria-hidden="true">
-    <p>{{ t('app.dropVeil') }}</p>
-  </div>
+  <div v-if="dragging" class="xxd-dropveil drop-veil" data-open aria-hidden="true">{{ t('app.dropVeil') }}</div>
 </template>
 
 <style scoped>
@@ -106,7 +104,6 @@ onBeforeUnmount(() => {
   flex-direction: column;
   height: 100dvh;
   padding-inline-start: var(--rail-width);
-  transition: padding-inline-start 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 main {
   flex: 1 1 auto;
@@ -117,21 +114,9 @@ main {
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
-@media (max-width: 700px) {
+@media (max-width: 640px) {
   .shell { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
 }
-@media (prefers-reduced-motion: reduce) { .shell { transition: none; } }
-.drop-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  display: grid;
-  place-items: center;
-  margin: 12px;
-  border: 2px dashed var(--ink);
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: blur(4px);
-  pointer-events: none;
-}
-.drop-veil p { margin: 0; font-family: var(--font-title); font-size: 26px; font-weight: 900; }
+/* The kit's drop veil, pinned to the window: dropping YAML anywhere imports it. */
+.drop-veil { position: fixed; pointer-events: none; }
 </style>

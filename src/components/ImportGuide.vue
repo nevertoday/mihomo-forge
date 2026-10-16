@@ -15,11 +15,11 @@ import { t } from '@/i18n'
 </template>
 
 <style scoped>
-.guide { display: grid; gap: 12px; padding: 18px; border: 1px solid var(--line); background: var(--panel); }
-ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
-li { display: flex; gap: 10px; align-items: flex-start; }
-.n { flex: none; display: grid; place-items: center; width: 26px; height: 26px; background: var(--ink); color: var(--paper); font-weight: 700; }
-li p { margin: 2px 0 0; line-height: 1.6; }
-.core { margin: 0; font-size: 12px; }
-@media (max-width: 860px) { ol { grid-template-columns: 1fr; } }
+.guide { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); }
+ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+li { display: flex; align-items: flex-start; gap: var(--space-2); }
+.n { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: var(--r-xs); background: var(--wash-strong); font: var(--weight-medium) var(--text-xs) / 1 var(--font-body); }
+li p { margin: 0; font-size: var(--text-sm); line-height: var(--leading-sm); }
+.core { margin: 0; font-size: var(--text-xs); line-height: var(--leading-sm); }
+@media (max-width: 1024px) { ol { grid-template-columns: minmax(0, 1fr); } }
 </style>

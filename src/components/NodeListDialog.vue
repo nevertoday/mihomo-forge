@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import Icon from '@/components/Icon.vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { OTHER_REGION_ID } from '@/catalog/regions'
 import { regionName, t, tDynamic } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
 import type { NodeWarning, RejectedNode, Source } from '@/types'
+import KitDialog from './KitDialog.vue'
 
 const props = defineProps<{ source: Source }>()
 const emit = defineEmits<{ close: [] }>()
@@ -43,45 +44,41 @@ function setRegion(fingerprint: string, regionId: string) {
   else store.settings.regionOverrides[fingerprint] = regionId
 }
 
-const onKey = (e: KeyboardEvent) => e.key === 'Escape' && emit('close')
-onMounted(() => window.addEventListener('keydown', onKey))
-onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <template>
-  <div class="overlay" @click.self="emit('close')">
-    <section class="dialog dialog-wide" role="dialog" aria-modal="true" :aria-label="t('nodeList.title', { name: source.name })">
-      <header class="dialog-head">
-        <h2>{{ t('nodeList.title', { name: source.name }) }} <span class="muted">· {{ t('count.nodes', { n: source.nodes.length }) }}</span></h2>
-        <button type="button" class="icon-btn" :aria-label="t('common.close')" @click="emit('close')"><Icon name="X"  /></button>
-      </header>
-      <div class="dialog-body stack">
-        <div class="row">
-          <label class="search">
-            <Icon name="Search" aria-hidden="true" />
-            <input v-model="query" class="input" type="search" :placeholder="t('nodeList.search')" />
-          </label>
-          <label class="check"><input v-model="onlyIssues" type="checkbox" /><span>{{ t('nodeList.onlyIssues') }}</span></label>
+  <KitDialog size="xl" light-dismiss labelledby="node-list-title" @close="emit('close')">
+    <div class="xxd-dialog__head">
+      <h2 id="node-list-title" class="xxd-dialog__title">{{ t('nodeList.title', { name: source.name }) }} <span class="count">· {{ t('count.nodes', { n: source.nodes.length }) }}</span></h2>
+      <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('common.close')" @click="emit('close')"><Icon name="X" :size="16" /></button>
+    </div>
+    <div class="xxd-dialog__body body">
+      <div class="xxd-cluster">
+        <div class="xxd-input-wrap search">
+          <Icon name="Search" :size="16" />
+          <input v-model="query" class="xxd-input" type="search" :placeholder="t('nodeList.search')" :aria-label="t('nodeList.search')" />
         </div>
-        <div class="table-wrap">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ t('nodeList.colName') }}</th>
-                <th>{{ t('nodeList.colType') }}</th>
-                <th>{{ t('nodeList.colServer') }}</th>
-                <th>{{ t('nodeList.colRegion') }}</th>
-                <th>{{ t('nodeList.colNotes') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="{ node, out } in rows" :key="node.fingerprint + node.originalName" :class="{ dup: !out }">
-                <td class="name" dir="auto">{{ out?.displayName ?? `[${source.name}] ${node.originalName}` }}</td>
-                <td><span class="chip mono">{{ node.raw.type }}</span></td>
-                <td class="mono server" dir="ltr">{{ node.raw.server }}:{{ node.raw.port }}</td>
-                <td>
+        <label class="xxd-choice"><input v-model="onlyIssues" type="checkbox" class="xxd-check" />{{ t('nodeList.onlyIssues') }}</label>
+      </div>
+      <div class="xxd-table-wrap list">
+        <table class="xxd-table" data-density="compact" data-sticky-head>
+          <thead>
+            <tr>
+              <th>{{ t('nodeList.colName') }}</th>
+              <th>{{ t('nodeList.colType') }}</th>
+              <th>{{ t('nodeList.colServer') }}</th>
+              <th>{{ t('nodeList.colRegion') }}</th>
+              <th>{{ t('nodeList.colNotes') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="{ node, out } in rows" :key="node.fingerprint + node.originalName" :class="{ dup: !out }">
+              <td class="name" dir="auto">{{ out?.displayName ?? `[${source.name}] ${node.originalName}` }}</td>
+              <td><span class="xxd-badge mono">{{ node.raw.type }}</span></td>
+              <td class="server" dir="ltr">{{ node.raw.server }}:{{ node.raw.port }}</td>
+              <td>
+                <label class="xxd-select" data-size="sm">
                   <select
-                    class="select region"
                     :value="store.settings.regionOverrides[node.fingerprint] ?? '__auto'"
                     :disabled="!out"
                     :aria-label="t('nodeList.regionLabel')"
@@ -90,36 +87,37 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
                     <option value="__auto">{{ t('nodeList.regionAuto', { region: labelOf(out?.regionId ?? OTHER_REGION_ID) }) }}</option>
                     <option v-for="r in store.settings.regions" :key="r.id" :value="r.id">{{ r.icon }} {{ regionName(r) }}</option>
                   </select>
-                </td>
-                <td class="warn">
-                  <template v-if="!out">{{ t('nodeList.duplicate') }}</template>
-                  <template v-else>{{ out.warnings.map(warningText).join('; ') }}</template>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <details v-if="source.rejected.length" class="rejected">
-          <summary>{{ t('nodeList.rejectedSummary', { n: source.rejected.length }) }}</summary>
-          <ul>
-            <li v-for="(r, i) in source.rejected" :key="i"><b dir="auto">{{ r.name }}</b> — {{ rejectText(r) }}</li>
-          </ul>
-        </details>
+                </label>
+              </td>
+              <td class="warn" data-wrap>
+                <template v-if="!out">{{ t('nodeList.duplicate') }}</template>
+                <template v-else>{{ out.warnings.map(warningText).join('; ') }}</template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </section>
-  </div>
+      <details v-if="source.rejected.length" class="xxd-collapse">
+        <summary>{{ t('nodeList.rejectedSummary', { n: source.rejected.length }) }}</summary>
+        <ul class="rejected">
+          <li v-for="(r, i) in source.rejected" :key="i"><span class="rejected-name" dir="auto">{{ r.name }}</span> — {{ rejectText(r) }}</li>
+        </ul>
+      </details>
+    </div>
+  </KitDialog>
 </template>
 
 <style scoped>
-.search { position: relative; flex: 1; min-width: 220px; }
-.search svg { position: absolute; inset-inline-start: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: var(--muted); }
-.search .input { padding-inline-start: 36px; }
-.table-wrap { max-height: 56dvh; }
-.name { font-weight: 600; min-width: 200px; }
-.server { color: var(--muted); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.region { min-height: 32px; padding-top: 4px; padding-bottom: 4px; min-width: 140px; }
-.warn { color: var(--notice-warning-ink); font-size: 12px; min-width: 160px; }
-tr.dup td { opacity: 0.5; }
-.rejected summary { cursor: pointer; font-weight: 700; }
-.rejected ul { margin: 8px 0 0; padding-inline-start: 18px; color: var(--muted); font-size: 13px; }
+.count { color: var(--muted); font-weight: var(--weight-regular); }
+.body { padding-bottom: var(--space-5); color: var(--ink); }
+.search { flex: 1; min-width: 220px; }
+.list { max-height: 56dvh; overflow: auto; }
+.name { min-width: 200px; font-weight: var(--weight-medium); }
+.mono { font-family: var(--font-mono); }
+.server { max-width: 220px; overflow: hidden; color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); text-overflow: ellipsis; }
+.xxd-select { min-width: 140px; }
+.warn { min-width: 160px; color: var(--warning); font-size: var(--text-xs); }
+tr.dup td { color: var(--disabled-ink); }
+.rejected { margin: var(--space-2) 0 0; padding-inline-start: var(--space-5); color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+.rejected-name { color: var(--ink); font-weight: var(--weight-medium); }
 </style>

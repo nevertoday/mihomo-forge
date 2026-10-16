@@ -27,7 +27,6 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
   <div v-if="!store.sources.length" class="page start">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('overview.eyebrow') }}</p>
         <h1 class="page-title">{{ t('overview.emptyTitle') }}</h1>
         <p class="page-lede">{{ t('overview.emptyLede') }}</p>
       </div>
@@ -40,7 +39,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <div class="stack">
       <DropZone />
       <PrivacyNote />
-      <button type="button" class="btn start-wizard" @click="emit('wizard')"><Icon name="WandSparkles"  />{{ t('overview.emptyWizard') }}</button>
+      <button type="button" class="xxd-btn start-wizard" @click="emit('wizard')"><Icon name="WandSparkles" :size="16" /><span>{{ t('overview.emptyWizard') }}</span></button>
     </div>
     <section class="section">
       <ProjectFileCard />
@@ -50,7 +49,6 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
   <div v-else class="page">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('overview.eyebrow') }}</p>
         <h1 class="page-title" dir="auto">{{ store.settings.name }}</h1>
         <p class="page-lede">
           {{ t('count.sources', { n: store.sources.length }) }} · {{ t('count.nodes', { n: b.stats.nodes }) }} ·
@@ -58,8 +56,8 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
         </p>
       </div>
       <div class="row">
-        <button type="button" class="btn" @click="emit('wizard')">{{ t('overview.rerunWizard') }}</button>
-        <button type="button" class="btn btn-primary" @click="go('build')"><Icon name="Download"  />{{ t('overview.rebuild') }}</button>
+        <button type="button" class="xxd-btn" @click="emit('wizard')">{{ t('overview.rerunWizard') }}</button>
+        <button type="button" class="xxd-btn" data-variant="primary" @click="go('build')"><Icon name="Download" :size="16" /><span>{{ t('overview.rebuild') }}</span></button>
       </div>
     </header>
 
@@ -75,14 +73,13 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     </div>
 
     <section class="section">
-      <div class="stats">
-        <div class="stat"><strong>{{ b.stats.nodes }}</strong><span>{{ t('overview.statNodes') }}</span></div>
-        <div class="stat"><strong>{{ b.stats.duplicates }}</strong><span>{{ t('overview.statDuplicates') }}</span></div>
-        <div class="stat"><strong>{{ b.strategies.length }}</strong><span>{{ t('overview.statStrategies') }}</span></div>
-        <div class="stat"><strong>{{ b.stats.businessStrategies }}</strong><span>{{ t('overview.statBusiness') }}</span></div>
-        <div class="stat"><strong>{{ b.stats.ruleProviders }}</strong><span>{{ t('overview.statProviders') }}</span></div>
-        <div class="stat" :class="{ bad: errors }">
-          <strong>{{ errors || warnings }}</strong><span>{{ errors ? t('overview.statErrors') : t('overview.statWarnings') }}</span>
+      <div class="xxd-stats stats">
+        <div class="xxd-stat"><p class="xxd-stat__label">{{ t('overview.statNodes') }}</p><p class="xxd-stat__value">{{ b.stats.nodes }}</p></div>
+        <div class="xxd-stat"><p class="xxd-stat__label">{{ t('overview.statDuplicates') }}</p><p class="xxd-stat__value">{{ b.stats.duplicates }}</p></div>
+        <div class="xxd-stat"><p class="xxd-stat__label">{{ t('overview.statStrategies') }}</p><p class="xxd-stat__value">{{ b.strategies.length }}</p></div>
+        <div class="xxd-stat"><p class="xxd-stat__label">{{ t('overview.statBusiness') }}</p><p class="xxd-stat__value">{{ b.stats.businessStrategies }}</p></div>
+        <div class="xxd-stat"><p class="xxd-stat__label">{{ t('overview.statProviders') }}</p><p class="xxd-stat__value">{{ b.stats.ruleProviders }}</p></div>
+        <div class="xxd-stat" :class="{ bad: errors }"><p class="xxd-stat__label">{{ errors ? t('overview.statErrors') : t('overview.statWarnings') }}</p><p class="xxd-stat__value">{{ errors || warnings }}</p>
         </div>
       </div>
     </section>
@@ -90,7 +87,7 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <section v-if="store.sources.length" class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('overview.sourcesTitle') }}</h2>
-        <button type="button" class="btn btn-sm btn-quiet" @click="go('sources')">{{ t('overview.manageSources') }}<Icon name="ArrowRight" class="dir-icon" /></button>
+        <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="go('sources')"><span>{{ t('overview.manageSources') }}</span><Icon name="ArrowRight" class="dir-icon" /></button>
       </div>
       <div class="grid grid-cards">
         <SourceCard v-for="(s, i) in store.sources" :key="s.id" :source="s" :index="i" :total="store.sources.length" :actions="false" />
@@ -100,10 +97,10 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
     <section class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('overview.businessTitle') }}</h2>
-        <button type="button" class="btn btn-sm btn-quiet" @click="go('rules')">{{ t('overview.adjust') }}<Icon name="ArrowRight" class="dir-icon" /></button>
+        <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="go('rules')"><span>{{ t('overview.adjust') }}</span><Icon name="ArrowRight" class="dir-icon" /></button>
       </div>
-      <div class="table-wrap">
-        <table class="table">
+      <div class="xxd-table-wrap">
+        <table class="xxd-table">
           <thead>
             <tr><th>{{ t('overview.colGroup') }}</th><th>{{ t('overview.colDefault') }}</th><th>{{ t('overview.colOthers') }}</th></tr>
           </thead>
@@ -127,12 +124,12 @@ const warnings = computed(() => b.value.issues.filter((i) => i.level === 'WARNIN
 </template>
 
 <style scoped>
-.start-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; padding: 0; list-style: none; }
-.start-steps li { display: flex; gap: 10px; align-items: flex-start; padding: 14px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; line-height: 1.55; }
-.start-steps .n { flex: none; display: grid; place-items: center; width: 26px; height: 26px; background: var(--ink); color: var(--paper); }
+.start-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
+.start-steps li { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body); }
+.start-steps .n { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: var(--r-xs); background: var(--wash-strong); font-size: var(--text-xs); line-height: 1; }
 .start-wizard { justify-self: start; }
-@media (max-width: 700px) { .start-steps { grid-template-columns: 1fr; } }
-.update { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 18px; border: 1px solid var(--line); background: var(--panel); }
-.stat.bad strong { color: var(--notice-error-ink); }
-@media (max-width: 700px) { .update { grid-template-columns: 1fr; } }
+.update { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-5); align-items: center; padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); }
+.stats { --stat-min: 140px; }
+.xxd-stat.bad .xxd-stat__value { color: var(--danger); }
+@media (max-width: 640px) { .start-steps, .update { grid-template-columns: minmax(0, 1fr); } }
 </style>

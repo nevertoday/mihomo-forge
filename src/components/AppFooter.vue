@@ -24,17 +24,15 @@ import { t } from '@/i18n'
 .app-footer {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 24px;
   align-items: center;
   justify-content: space-between;
+  gap: 0 var(--space-6);
   margin-top: auto;
-  padding: 4px var(--gutter);
+  padding: var(--space-1) var(--gutter);
   border-top: 1px solid var(--line);
-  background: var(--panel);
 }
-.meta, nav { display: flex; flex-wrap: wrap; gap: 0 14px; align-items: center; }
-.meta { color: var(--muted); font-size: 11px; font-weight: 650; white-space: nowrap; }
-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); font-size: 12px; font-weight: 800; text-decoration: none; }
+.meta, nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-3); }
+.meta { color: var(--muted); font-size: var(--text-2xs); line-height: var(--leading-xs); white-space: nowrap; }
+nav a { display: inline-flex; align-items: center; min-height: var(--hit-min); color: var(--ink); font: var(--weight-medium) var(--text-xs) / var(--leading-xs) var(--font-body); text-decoration: none; }
 nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
-@media (max-width: 700px) { .app-footer, .meta, nav { gap: 0 12px; } }
 </style>

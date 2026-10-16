@@ -1,0 +1,4 @@
+{
+  "vendorDir": "public/vendor/xxd",
+  "iconNodesTargets": ["src/vendor/xxd-icon-nodes.js"]
+}

@@ -29,8 +29,9 @@ function onDrop(e: DragEvent) {
 
 <template>
   <div
-    class="dropzone"
-    :class="{ 'is-over': over, 'is-compact': compact }"
+    class="xxd-dropzone dropzone"
+    :class="{ 'is-compact': compact }"
+    :data-over="over ? '' : undefined"
     role="button"
     tabindex="0"
     :aria-label="t('dropzone.label')"
@@ -41,35 +42,20 @@ function onDrop(e: DragEvent) {
     @dragleave.prevent="over = false"
     @drop.prevent="onDrop"
   >
-    <Icon name="FileUp" class="dz-icon" aria-hidden="true" />
+    <Icon name="FileUp" :size="24" />
     <div class="dz-copy">
-      <strong>{{ busy ? t('dropzone.busy') : t('dropzone.title') }}</strong>
-      <span v-if="!compact">{{ t('dropzone.hint') }}</span>
+      <p class="xxd-dropzone__title">{{ busy ? t('dropzone.busy') : t('dropzone.title') }}</p>
+      <p v-if="!compact" class="xxd-help">{{ t('dropzone.hint') }}</p>
     </div>
     <input ref="input" type="file" accept=".yaml,.yml,.txt" multiple hidden @change="take(($event.target as HTMLInputElement).files)" />
   </div>
 </template>
 
 <style scoped>
-.dropzone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 180px;
-  padding: 28px;
-  border: 1.5px dashed var(--line-strong);
-  background: var(--panel);
-  cursor: pointer;
-  text-align: start;
-  transition: border-color 160ms ease, background 160ms ease;
-}
-.dropzone:hover, .dropzone.is-over { border-color: var(--ink); background: var(--active-wash); }
-.dropzone.is-compact { min-height: 72px; padding: 14px 18px; justify-content: flex-start; }
-.dz-icon { width: 32px; height: 32px; stroke-width: 1.5; flex: none; }
-.is-compact .dz-icon { width: 22px; height: 22px; }
-.dz-copy { display: grid; gap: 4px; }
-.dz-copy strong { font-size: 16px; }
-.is-compact .dz-copy strong { font-size: 14px; }
-.dz-copy span { color: var(--muted); font-size: 13px; }
+/* The kit's drop zone; compact on pages that already have sources (a one-line target). */
+.xxd-dropzone { cursor: pointer; }
+.xxd-dropzone:hover { border-color: var(--line-control); background: var(--wash); }
+.xxd-dropzone.is-compact { display: flex; justify-content: flex-start; gap: var(--space-3); padding: var(--space-4); text-align: start; }
+.dz-copy { display: grid; gap: var(--space-0-5); }
+.xxd-dropzone__title, .xxd-help { margin: 0; }
 </style>

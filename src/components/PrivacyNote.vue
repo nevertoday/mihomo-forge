@@ -4,7 +4,7 @@ import Icon from './Icon.vue'
 </script>
 
 <template>
-  <p class="notice notice-plain privacy"><Icon name="LockKeyhole" />{{ t('app.privacy') }}</p>
+  <div class="xxd-banner privacy" data-size="sm"><Icon name="LockKeyhole" :size="16" /><p class="xxd-banner__title">{{ t('app.privacy') }}</p></div>
 </template>
 
 <style scoped>

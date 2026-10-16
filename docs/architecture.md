@@ -85,4 +85,13 @@ lan → block → ai → developer → streaming → social → other → china 
 - `zh-CN` 是基准语言包；其余语言的类型由它推导，`tests/i18n` 校验键与占位符完全一致。
 - 复数用 `Intl.PluralRules` 按 `{n}` 选择；阿拉伯语采用「标签：数字」的中性写法，避免六种复数形式带来的语法问题。
 - 阿拉伯语设置 `<html dir="rtl">`，布局全部使用 CSS 逻辑属性，方向性图标通过 `.dir-icon` 镜像。
-- 繁体中文、日文、阿拉伯文的标题字体按需从 Google Fonts 加载。
+- 只用系统里已有的无衬线字体，不加载网络字体；日文、阿拉伯文的字体栈在 `src/styles/main.css` 里补充。
+
+## 界面样式
+
+界面用 [小小东 UI Kit](https://github.com/nevertoday/xxd-ui-kit)（MIT）：
+
+- 颜色、字号、间距、圆角都取令牌（`var(--…)`），组件用 `xxd-*` 类（按钮、输入框、对话框、横幅、表格等）。
+- `public/vendor/xxd/` 和 `src/vendor/xxd-icon-nodes.js` 由 `xxd-ui sync` 生成，不手改；`xxd.config.json` 记着路径。
+- `public/vendor/xxd/boot.js` 在首帧之前应用主题（亮 / 暗 / 跟随系统），选择存在 localStorage 的 `mihomo-forge-ui`。
+- `src/styles/main.css` 只负责应用外壳和页面布局；改完跑 `xxd-ui doctor .` 检查写死的颜色、字重、圆角。

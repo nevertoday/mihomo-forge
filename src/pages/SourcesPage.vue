@@ -22,11 +22,10 @@ const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() =>
   <div class="page">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('sourcesPage.eyebrow') }}</p>
         <h1 class="page-title">{{ t('nav.sources') }}</h1>
         <p class="page-lede">{{ t('sourcesPage.lede') }}</p>
       </div>
-      <p class="chip chip-dark">{{ t('count.sources', { n: store.sources.length }) }} · {{ t('count.nodes', { n: store.nodeCount }) }}</p>
+      <p class="xxd-badge">{{ t('count.sources', { n: store.sources.length }) }} · {{ t('count.nodes', { n: store.nodeCount }) }}</p>
     </header>
 
     <div class="stack">
@@ -41,19 +40,19 @@ const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() =>
       <p class="section-note order-note">{{ t('sourcesPage.orderNote') }}</p>
     </section>
 
-    <details class="section advanced">
+    <details class="xxd-collapse section advanced">
       <summary>{{ t('sourcesPage.advanced') }}</summary>
       <div class="section-head">
         <h2 class="section-title">{{ t('sourcesPage.dedupeTitle') }}</h2>
       </div>
       <div class="grid dedupe">
-        <label v-for="d in DEDUPE" :key="d.id" class="check card-check">
-          <input v-model="store.settings.dedupeMode" type="radio" name="dedupe" :value="d.id" />
+        <label v-for="d in DEDUPE" :key="d.id" class="xxd-choice card-check">
+          <input class="xxd-radio" v-model="store.settings.dedupeMode" type="radio" name="dedupe" :value="d.id" />
           <span class="check-label"><strong>{{ d.label }}</strong><small>{{ d.hint }}</small></span>
         </label>
       </div>
-      <label class="check info-check">
-        <input v-model="store.settings.excludeInfoNodes" type="checkbox" />
+      <label class="xxd-choice info-check">
+        <input class="xxd-check" v-model="store.settings.excludeInfoNodes" type="checkbox" />
         <span class="check-label"><strong>{{ t('sourcesPage.excludeInfo') }}</strong><small>{{ t('sourcesPage.excludeInfoHint') }}</small></span>
       </label>
     </details>
@@ -63,11 +62,8 @@ const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() =>
 </template>
 
 <style scoped>
-.order-note { margin-top: 10px; }
-.dedupe { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
-.card-check { border: 1px solid var(--line); background: var(--panel); padding: 12px; }
-.card-check:has(input:checked) { border-color: var(--ink); }
-.info-check { margin-top: 10px; }
-.advanced > summary { cursor: pointer; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
-.advanced[open] > summary { color: var(--ink); }
+.order-note { margin-top: var(--space-2); }
+.dedupe { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-2); }
+.info-check { margin-top: var(--space-3); }
+.advanced > summary { margin-bottom: var(--space-3); }
 </style>

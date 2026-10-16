@@ -49,33 +49,33 @@ function reset() {
       <p class="eyebrow">{{ moduleLabel }}{{ service.optional ? ` · ${t('service.optional')}` : '' }}</p>
       <h2 class="detail-title">{{ service.icon }} {{ serviceName(service) }}</h2>
       <p v-if="description" class="section-note">{{ description }}</p>
-      <p v-if="!enabled" class="notice notice-warning">{{ t('service.notEnabled') }}</p>
+      <p v-if="!enabled" class="xxd-banner" data-tone="warning">{{ t('service.notEnabled') }}</p>
     </header>
 
     <div class="detail-grid">
       <div class="detail-main">
         <template v-if="service.fixedTarget">
-          <p class="notice notice-plain">{{ t('service.fixed', { target: service.fixedTarget }) }}</p>
+          <p class="xxd-banner">{{ t('service.fixed', { target: service.fixedTarget }) }}</p>
         </template>
         <template v-else>
-          <div class="field">
-            <span>{{ t('service.defaultLabel') }}</span>
-            <select class="select" :value="setting.defaultRef" @change="setDefault(($event.target as HTMLSelectElement).value)">
+          <div class="xxd-field">
+            <span class="xxd-label">{{ t('service.defaultLabel') }}</span>
+            <span class="xxd-select"><select  :value="setting.defaultRef" @change="setDefault(($event.target as HTMLSelectElement).value)">
               <option v-for="ref in setting.candidates" :key="ref" :value="ref">{{ optionName(ref, store.build) }}</option>
-            </select>
-            <small>{{ t('service.defaultHint', { group: serviceGroupName(service, store.settings.outputLocale) }) }}</small>
+            </select></span>
+            <small class="xxd-help">{{ t('service.defaultHint', { group: serviceGroupName(service, store.settings.outputLocale) }) }}</small>
           </div>
 
           <div class="candidates">
             <div class="row cand-head">
               <strong>{{ t('service.allowed') }}</strong>
               <span class="spacer"></span>
-              <button v-if="customised" type="button" class="btn btn-sm btn-quiet" @click="reset"><Icon name="RotateCcw"  />{{ t('common.reset') }}</button>
+              <button v-if="customised" type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="reset"><Icon name="RotateCcw" :size="16" /><span>{{ t('common.reset') }}</span></button>
             </div>
             <fieldset v-for="g in groups" :key="g.id" class="cand-group">
               <legend>{{ g.label }}</legend>
-              <label v-for="o in g.options" :key="o.ref" class="check">
-                <input type="checkbox" :checked="checked.has(o.ref)" @change="toggle(o.ref)" />
+              <label v-for="o in g.options" :key="o.ref" class="xxd-choice">
+                <input class="xxd-check" type="checkbox" :checked="checked.has(o.ref)" @change="toggle(o.ref)" />
                 <span class="check-label"><strong dir="auto">{{ o.name }}</strong><small>{{ o.pool }}</small></span>
               </label>
             </fieldset>
@@ -104,20 +104,20 @@ function reset() {
 </template>
 
 <style scoped>
-.detail { display: grid; gap: 20px; }
-.detail-head { display: grid; gap: 4px; }
+.detail { display: grid; gap: var(--space-5); }
+.detail-head { display: grid; gap: var(--space-1); }
 .detail-head .eyebrow { margin: 0; }
-.detail-title { margin: 0; font-family: var(--font-title); font-size: 26px; font-weight: 900; }
-.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 24px; align-items: start; }
-.detail-main { display: grid; gap: 20px; }
-.candidates { display: grid; gap: 10px; }
-.cand-head { min-height: 30px; }
-.cand-group { margin: 0; padding: 4px 0 0; border: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 2px; }
-.cand-group legend { padding-inline-end: 8px; color: var(--muted); font-size: 12px; font-weight: 800; }
-.rulesets ul { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 12.5px; text-align: start; }
-.rulesets li { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
-.rulesets a { text-decoration: none; font-size: 11.5px; }
+.detail-title { margin: 0; font: var(--weight-strong) var(--text-xxl) / var(--leading-xl) var(--font-title); }
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: var(--space-6); align-items: start; }
+.detail-main { display: grid; gap: var(--space-5); }
+.candidates { display: grid; gap: var(--space-3); }
+.cand-head { min-height: var(--control-h-sm); }
+.cand-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-2) var(--space-3); margin: 0; padding: var(--space-1) 0 0; border: 0; }
+.cand-group legend { margin-bottom: var(--space-1); padding: 0; color: var(--muted); font: var(--weight-medium) var(--text-xs) / var(--leading-xs) var(--font-body); }
+.rulesets ul { display: grid; gap: var(--space-1); margin: var(--space-1-5) 0 0; padding: 0; list-style: none; font-size: var(--text-xs); text-align: start; }
+.rulesets li { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+.rulesets a { font-size: var(--text-xs); text-decoration: none; }
 .rulesets a:hover { color: var(--ink); text-decoration: underline; }
-.detail-side { position: sticky; top: 16px; }
-@media (max-width: 980px) { .detail-grid { grid-template-columns: 1fr; } .detail-side { position: static; } }
+.detail-side { position: sticky; top: var(--space-4); }
+@media (max-width: 1024px) { .detail-grid { grid-template-columns: minmax(0, 1fr); } .detail-side { position: static; } }
 </style>

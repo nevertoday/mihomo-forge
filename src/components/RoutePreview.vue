@@ -40,7 +40,7 @@ const shown = computed(() => rows.value.slice(0, MAX))
     <ul class="branches">
       <li v-for="r in shown" :key="r.ref" :class="{ 'is-default': r.isDefault }">
         <div class="node node-leaf">
-          <span><bdi>{{ r.name }}</bdi><em v-if="r.isDefault">{{ t('route.default') }}</em></span>
+          <span><bdi>{{ r.name }}</bdi><span v-if="r.isDefault" class="xxd-badge" data-variant="solid">{{ t('route.default') }}</span></span>
           <small>{{ r.pool }}</small>
         </div>
       </li>
@@ -50,19 +50,18 @@ const shown = computed(() => rows.value.slice(0, MAX))
 </template>
 
 <style scoped>
-.route { margin: 0; padding: 16px; border: 1px solid var(--line); background: var(--panel); }
-.route .eyebrow { margin: 0 0 12px; }
-.node { display: grid; gap: 2px; padding: 8px 12px; border: 1px solid var(--line-strong); background: var(--paper); }
-.node span { font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-.node small { color: var(--muted); font-size: 11.5px; line-height: 1.4; text-align: start; }
-.node-group { border-color: var(--ink); background: var(--ink); color: var(--paper); }
-.node-group small { color: color-mix(in srgb, var(--paper) 70%, transparent); }
-.stem { width: 1px; height: 16px; margin-inline-start: 20px; background: var(--line-strong); }
-.branches { position: relative; margin: 0; padding: 0; padding-inline-start: 20px; list-style: none; display: grid; gap: 6px; }
-.branches::before { content: ""; position: absolute; inset-inline-start: 20px; top: 0; bottom: 18px; width: 1px; background: var(--line-strong); }
-.branches li { position: relative; padding-inline-start: 16px; }
-.branches li::before { content: ""; position: absolute; inset-inline-start: 0; top: 18px; width: 16px; height: 1px; background: var(--line-strong); }
-.is-default .node-leaf { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-em { font-style: normal; font-size: 10.5px; font-weight: 800; padding: 0 5px; background: var(--ink); color: var(--paper); }
-.more { font-size: 12px; padding-top: 2px; }
+.route { margin: 0; padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); }
+.route .eyebrow { margin: 0 0 var(--space-3); }
+.node { display: grid; gap: var(--space-0-5); padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--paper); }
+.node span { display: flex; align-items: center; gap: var(--space-1-5); font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body); }
+.node small { color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-xs); text-align: start; }
+/* The group is the one the user picks from in OpenClash: a quiet fill, not a solid block. */
+.node-group { border-color: var(--line-strong); background: var(--wash); }
+.stem { width: 1px; height: var(--space-4); margin-inline-start: var(--space-5); background: var(--line-strong); }
+.branches { position: relative; display: grid; gap: var(--space-1-5); margin: 0; padding: 0; padding-inline-start: var(--space-5); list-style: none; }
+.branches::before { content: ""; position: absolute; inset-inline-start: var(--space-5); top: 0; bottom: 18px; width: 1px; background: var(--line-strong); }
+.branches li { position: relative; padding-inline-start: var(--space-4); }
+.branches li::before { content: ""; position: absolute; inset-inline-start: 0; top: 18px; width: var(--space-4); height: 1px; background: var(--line-strong); }
+.is-default .node-leaf { background: var(--selected-bg); }
+.more { padding-top: var(--space-0-5); font-size: var(--text-xs); }
 </style>

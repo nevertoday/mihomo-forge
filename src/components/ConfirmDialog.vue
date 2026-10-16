@@ -1,37 +1,16 @@
 <script setup lang="ts">
-import { nextTick, onUnmounted, ref, watch } from 'vue'
 import { confirmRequest, settleConfirm } from '@/app/confirm'
 import { t } from '@/i18n'
-
-const cancelButton = ref<HTMLButtonElement>()
-const onKey = (e: KeyboardEvent) => e.key === 'Escape' && settleConfirm(false)
-
-watch(confirmRequest, async (req) => {
-  if (req) {
-    window.addEventListener('keydown', onKey)
-    await nextTick()
-    // Destructive dialogs start on the safe choice.
-    cancelButton.value?.focus()
-  } else window.removeEventListener('keydown', onKey)
-})
-onUnmounted(() => window.removeEventListener('keydown', onKey))
+import KitDialog from './KitDialog.vue'
 </script>
 
 <template>
-  <div v-if="confirmRequest" class="overlay" @click.self="settleConfirm(false)">
-    <section class="dialog confirm" role="alertdialog" aria-modal="true" aria-describedby="confirm-message">
-      <div class="dialog-body">
-        <p id="confirm-message">{{ confirmRequest.message }}</p>
-      </div>
-      <footer class="dialog-foot">
-        <button ref="cancelButton" type="button" class="btn btn-cancel" @click="settleConfirm(false)">{{ t('common.cancel') }}</button>
-        <button type="button" class="btn btn-danger-solid" @click="settleConfirm(true)">{{ confirmRequest.confirmLabel }}</button>
-      </footer>
-    </section>
-  </div>
+  <!-- A confirmation must be answered: no backdrop dismiss; focus starts on the safe choice. -->
+  <KitDialog v-if="confirmRequest" alert size="sm" labelledby="confirm-message" @close="settleConfirm(false)">
+    <div class="xxd-dialog__head"><h2 id="confirm-message" class="xxd-dialog__title">{{ confirmRequest.message }}</h2></div>
+    <div class="xxd-dialog__actions">
+      <button type="button" class="xxd-btn ui-dialog-cancel" autofocus @click="settleConfirm(false)">{{ t('common.cancel') }}</button>
+      <button type="button" class="xxd-btn" data-variant="danger" @click="settleConfirm(true)">{{ confirmRequest.confirmLabel }}</button>
+    </div>
+  </KitDialog>
 </template>
-
-<style scoped>
-.confirm { width: min(100%, 440px); }
-.confirm p { margin: 0; font-size: 15px; line-height: 1.6; }
-</style>

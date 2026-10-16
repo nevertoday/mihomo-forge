@@ -12,11 +12,10 @@ const store = useProjectStore()
   <div class="page">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('strategiesPage.eyebrow') }}</p>
         <h1 class="page-title">{{ t('nav.strategies') }}</h1>
         <p class="page-lede">{{ t('strategiesPage.lede') }}</p>
       </div>
-      <p class="chip chip-dark">{{ t('count.strategyGroups', { n: store.build.strategies.length }) }}</p>
+      <p class="xxd-badge">{{ t('count.strategyGroups', { n: store.build.strategies.length }) }}</p>
     </header>
     <StrategyOptions />
     <div class="composite-wrap"><FilterEditor /></div>
@@ -25,5 +24,5 @@ const store = useProjectStore()
 </template>
 
 <style scoped>
-.composite-wrap { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--line); }
+.composite-wrap { margin-top: var(--space-8); }
 </style>

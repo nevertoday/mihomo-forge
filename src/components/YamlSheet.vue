@@ -37,24 +37,25 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <template>
-  <div class="sheet-overlay" @click="emit('close')"></div>
-  <aside class="sheet" role="dialog" aria-modal="true" :aria-label="t('yaml.label')">
-    <header class="dialog-head">
-      <h2>config.yaml</h2>
-      <button type="button" class="btn btn-sm" @click="copy"><Icon name="Copy"  />{{ t('yaml.copy') }}</button>
-      <button type="button" class="btn btn-sm btn-primary" :disabled="!store.build.ok" @click="store.downloadConfig()"><Icon name="Download"  />{{ t('yaml.download') }}</button>
-      <button type="button" class="icon-btn" :aria-label="t('common.close')" @click="emit('close')"><Icon name="X"  /></button>
-    </header>
-    <div class="tabs sheet-tabs" role="tablist">
+  <div class="xxd-panel-scrim" data-open @click="emit('close')"></div>
+  <aside class="xxd-panel yaml-panel" data-open role="dialog" aria-modal="true" aria-labelledby="yaml-title">
+    <div class="xxd-panel__head">
+      <h2 id="yaml-title" class="xxd-panel__title">config.yaml</h2>
+      <button type="button" class="xxd-btn" data-size="sm" @click="copy"><Icon name="Copy" :size="16" /><span>{{ t('yaml.copy') }}</span></button>
+      <button type="button" class="xxd-btn" data-variant="primary" data-size="sm" :disabled="!store.build.ok" @click="store.downloadConfig()"><Icon name="Download" :size="16" /><span>{{ t('yaml.download') }}</span></button>
+      <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('common.close')" @click="emit('close')"><Icon name="X" :size="16" /></button>
+    </div>
+    <div class="xxd-tabs" role="tablist" :aria-label="t('yaml.label')">
       <button v-for="tab in (['all', 'base', 'proxy-groups', 'rules', 'rule-providers'] as const)" :key="tab" type="button" role="tab" :aria-selected="section === tab" @click="section = tab">
         {{ tab === 'all' ? t('yaml.all') : tab === 'base' ? t('yaml.base') : tab }}
       </button>
     </div>
-    <pre class="code yaml" dir="ltr">{{ shown }}</pre>
+    <pre class="xxd-code yaml" dir="ltr" tabindex="0">{{ shown }}</pre>
   </aside>
 </template>
 
 <style scoped>
-.sheet-tabs { padding: 0 12px; }
-.yaml { flex: 1; margin: 0; border: 0; }
+.yaml-panel { --panel-w: 760px; }
+.tabs { flex: none; padding-inline: var(--space-5); }
+.yaml { flex: 1; min-height: 0; overflow: auto; border-radius: 0; white-space: pre; tab-size: 2; text-align: left; }
 </style>

@@ -117,8 +117,8 @@ function summary(f: FilterStrategy): string {
       <p class="section-note">{{ t('filter.note') }}</p>
     </header>
 
-    <div v-if="list.length" class="table-wrap">
-      <table class="table">
+    <div v-if="list.length" class="xxd-table-wrap">
+      <table class="xxd-table">
         <thead>
           <tr>
             <th>{{ t('filter.colGroup') }}</th>
@@ -132,11 +132,11 @@ function summary(f: FilterStrategy): string {
           <tr v-for="f in list" :key="f.id" :class="{ empty: !builtByRef.get(`filter:${f.id}`) }">
             <td dir="auto"><strong>{{ f.name }}</strong></td>
             <td class="muted" dir="auto">{{ summary(f) }}</td>
-            <td><span class="chip">{{ modeLabel(f.mode) }}</span></td>
+            <td><span class="xxd-badge">{{ modeLabel(f.mode) }}</span></td>
             <td class="num">{{ builtByRef.get(`filter:${f.id}`)?.nodeCount ?? 0 }}</td>
             <td class="end">
-              <button type="button" class="icon-btn" :aria-label="t('filter.edit')" @click="open(f)"><Icon name="Pencil"  /></button>
-              <button type="button" class="icon-btn" :aria-label="t('filter.remove')" @click="remove(f.id)"><Icon name="Trash"  /></button>
+              <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('filter.edit')" @click="open(f)"><Icon name="Pencil" :size="16" /></button>
+              <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('filter.remove')" @click="remove(f.id)"><Icon name="Trash" :size="16" /></button>
             </td>
           </tr>
         </tbody>
@@ -145,52 +145,52 @@ function summary(f: FilterStrategy): string {
 
     <form v-if="editing !== null" class="card editor" @submit.prevent="submit">
       <div class="fields">
-        <label class="field">
-          <span>{{ t('filter.include') }}</span>
-          <input v-model="draft.includeText" class="input" dir="auto" placeholder="IEPL 专线" autofocus />
-          <small>{{ t('filter.includeHint') }}</small>
+        <label class="xxd-field">
+          <span class="xxd-label">{{ t('filter.include') }}</span>
+          <input v-model="draft.includeText" class="xxd-input" dir="auto" placeholder="IEPL 专线" autofocus />
+          <small class="xxd-help">{{ t('filter.includeHint') }}</small>
         </label>
-        <label class="field">
-          <span>{{ t('filter.exclude') }}</span>
-          <input v-model="draft.excludeText" class="input" dir="auto" />
-          <small>{{ t('filter.excludeHint') }}</small>
+        <label class="xxd-field">
+          <span class="xxd-label">{{ t('filter.exclude') }}</span>
+          <input v-model="draft.excludeText" class="xxd-input" dir="auto" />
+          <small class="xxd-help">{{ t('filter.excludeHint') }}</small>
         </label>
-        <label class="field">
-          <span>{{ t('filter.name') }}</span>
+        <label class="xxd-field">
+          <span class="xxd-label">{{ t('filter.name') }}</span>
           <input
             v-model="draft.name"
-            class="input"
+            class="xxd-input"
             dir="auto"
             maxlength="40"
             :placeholder="suggestedName || t('filter.namePlaceholder', { example: '🚀 IEPL' })"
           />
         </label>
-        <label class="field">
-          <span>{{ t('filter.region') }}</span>
-          <select v-model="draft.regionId" class="select">
+        <label class="xxd-field">
+          <span class="xxd-label">{{ t('filter.region') }}</span>
+          <span class="xxd-select"><select v-model="draft.regionId" >
             <option value="">{{ t('filter.anyRegion') }}</option>
             <option v-for="r in store.settings.regions" :key="r.id" :value="r.id">{{ r.icon }} {{ regionName(r) }}</option>
-          </select>
+          </select></span>
         </label>
-        <label class="field">
-          <span>{{ t('filter.mode') }}</span>
-          <select v-model="draft.mode" class="select">
+        <label class="xxd-field">
+          <span class="xxd-label">{{ t('filter.mode') }}</span>
+          <span class="xxd-select"><select v-model="draft.mode" >
             <option v-for="m in MODES" :key="m.id" :value="m.id">{{ m.label }}</option>
-          </select>
+          </select></span>
         </label>
       </div>
 
-      <div class="field">
-        <span>{{ t('filter.sources') }}</span>
+      <div class="xxd-field">
+        <span class="xxd-label">{{ t('filter.sources') }}</span>
         <div class="row">
-          <button type="button" class="chip chip-toggle" :aria-pressed="!draft.sourceIds.length" @click="draft.sourceIds = []">
+          <button type="button" class="xxd-chip" :aria-pressed="!draft.sourceIds.length" @click="draft.sourceIds = []">
             {{ t('filter.allSources') }}
           </button>
           <button
             v-for="s in store.sources"
             :key="s.id"
             type="button"
-            class="chip chip-toggle"
+            class="xxd-chip"
             :aria-pressed="draft.sourceIds.includes(s.id)"
             @click="toggleSource(s.id)"
           >
@@ -199,44 +199,43 @@ function summary(f: FilterStrategy): string {
         </div>
       </div>
 
-      <label class="check regex">
-        <input v-model="draft.regex" type="checkbox" />
+      <label class="xxd-choice regex">
+        <input class="xxd-check" v-model="draft.regex" type="checkbox" />
         <span class="check-label"><strong>{{ t('filter.regex') }}</strong><small>{{ t('filter.regexHint') }}</small></span>
       </label>
 
-      <div class="preview" :class="{ none: !matches.length }" role="status">
-        <strong>{{ matches.length ? t('filter.preview', { n: matches.length }) : t('filter.previewNone') }}</strong>
-        <p v-if="compiled.invalid.length" class="bad">{{ t('basePage.invalidPattern', { pattern: compiled.invalid.join(', ') }) }}</p>
-        <ul v-if="matches.length">
-          <li v-for="n in matches.slice(0, PREVIEW)" :key="n.displayName" dir="auto">{{ n.displayName }}</li>
-          <li v-if="matches.length > PREVIEW" class="muted">{{ t('filter.previewMore', { n: matches.length - PREVIEW }) }}</li>
-        </ul>
+      <div class="xxd-banner preview" data-size="sm" :data-tone="matches.length ? 'success' : 'warning'" role="status">
+        <Icon :name="matches.length ? 'CircleCheck' : 'TriangleAlert'" :size="16" />
+        <div>
+          <p class="xxd-banner__title">{{ matches.length ? t('filter.preview', { n: matches.length }) : t('filter.previewNone') }}</p>
+          <p v-if="compiled.invalid.length" class="bad">{{ t('basePage.invalidPattern', { pattern: compiled.invalid.join(', ') }) }}</p>
+          <ul v-if="matches.length">
+            <li v-for="n in matches.slice(0, PREVIEW)" :key="n.displayName" dir="auto">{{ n.displayName }}</li>
+            <li v-if="matches.length > PREVIEW" class="muted">{{ t('filter.previewMore', { n: matches.length - PREVIEW }) }}</li>
+          </ul>
+        </div>
       </div>
 
       <p v-if="error" class="bad">{{ error }}</p>
       <div class="row actions">
-        <button type="button" class="btn btn-cancel" @click="editing = null">{{ t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary" :disabled="!matches.length">{{ editing ? t('filter.save') : t('filter.create') }}</button>
+        <button type="button" class="xxd-btn ui-dialog-cancel" @click="editing = null">{{ t('common.cancel') }}</button>
+        <button type="submit" class="xxd-btn" data-variant="primary" :disabled="!matches.length">{{ editing ? t('filter.save') : t('filter.create') }}</button>
       </div>
     </form>
-    <button v-else type="button" class="btn add" :disabled="!store.sources.length" @click="open()"><Icon name="Plus"  />{{ t('filter.add') }}</button>
+    <button v-else type="button" class="xxd-btn add" :disabled="!store.sources.length" @click="open()"><Icon name="Plus" :size="16" /><span>{{ t('filter.add') }}</span></button>
   </section>
 </template>
 
 <style scoped>
-.filters { display: grid; gap: 12px; }
-.block-head { display: grid; gap: 2px; }
-.editor { display: grid; gap: 14px; }
-.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: start; }
-.regex { padding-inline-start: 0; }
-.preview { padding: 12px 14px; border: 1px solid var(--notice-success-border); background: var(--notice-success-bg); }
-.preview strong { color: var(--notice-success-ink); }
-.preview.none { border-color: var(--notice-warning-border); background: var(--notice-warning-bg); }
-.preview.none strong { color: var(--notice-warning-ink); }
-.preview ul { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 12.5px; }
-.bad { margin: 0; color: var(--notice-error-ink); font-size: 13px; }
+.filters { display: grid; gap: var(--space-3); }
+.block-head { display: grid; gap: var(--space-0-5); }
+.editor { display: grid; gap: var(--space-4); }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3); align-items: start; }
+.preview { margin: 0; }
+.preview ul { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: var(--space-1) 0 0; padding: 0; list-style: none; font-size: var(--text-xs); }
+.bad { margin: 0; color: var(--danger); font-size: var(--text-xs); line-height: var(--leading-sm); }
 .actions { justify-content: flex-end; }
-.add { justify-self: start; border-style: dashed; }
+.add { justify-self: start; }
 .end { text-align: end; white-space: nowrap; }
-tr.empty td { opacity: 0.55; }
+tr.empty td { color: var(--muted); }
 </style>

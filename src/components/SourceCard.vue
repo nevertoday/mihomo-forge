@@ -68,21 +68,21 @@ async function remove() {
       <div class="sc-title">
         <template v-if="!editing">
           <h3 dir="auto">{{ source.name }}</h3>
-          <button v-if="actions" type="button" class="icon-btn sm" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil"  /></button>
+          <button v-if="actions" type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil" :size="16" /></button>
         </template>
         <form v-else class="rename" @submit.prevent="commitRename">
-          <input ref="nameInput" v-model="draft" class="input" maxlength="32" dir="auto" :aria-label="t('sourceCard.nameLabel')" @keydown.esc="editing = false" @blur="commitRename" />
+          <input ref="nameInput" v-model="draft" class="xxd-input" maxlength="32" dir="auto" :aria-label="t('sourceCard.nameLabel')" @keydown.esc="editing = false" @blur="commitRename" />
         </form>
       </div>
       <div v-if="actions && total > 1" class="row order">
-        <button type="button" class="icon-btn sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><Icon name="ArrowUp"  /></button>
-        <button type="button" class="icon-btn sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><Icon name="ArrowDown"  /></button>
+        <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><Icon name="ArrowUp" :size="16" /></button>
+        <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><Icon name="ArrowDown" :size="16" /></button>
       </div>
     </header>
     <p v-if="error" class="sc-error">{{ error }}</p>
     <p class="sc-file mono" dir="auto">{{ source.originalFileName }}</p>
 
-    <p v-if="waiting" class="notice notice-warning sc-wait">{{ t('sourceCard.waiting', { file: source.originalFileName }) }}</p>
+    <p v-if="waiting" class="xxd-banner sc-wait" data-tone="warning" data-size="sm">{{ t('sourceCard.waiting', { file: source.originalFileName }) }}</p>
     <template v-else>
       <dl class="sc-counts">
         <div><dt>{{ t('sourceCard.valid') }}</dt><dd class="num">{{ built.length }}</dd></div>
@@ -90,41 +90,41 @@ async function remove() {
         <div><dt>{{ t('sourceCard.rejected') }}</dt><dd class="num" :class="{ muted: !source.rejected.length }">{{ source.rejected.length }}</dd></div>
       </dl>
       <div class="sc-regions">
-        <span v-for="r in regionChips" :key="r.id" class="chip" :title="r.label"><span>{{ r.icon }}</span><span class="num">{{ r.count }}</span></span>
+        <span v-for="r in regionChips" :key="r.id" class="xxd-badge" :title="r.label"><span>{{ r.icon }}</span><span class="num">{{ r.count }}</span></span>
       </div>
     </template>
 
     <footer v-if="actions" class="sc-actions">
-      <button type="button" class="btn btn-sm" :disabled="waiting" @click="emit('view', source)"><Icon name="Eye"  />{{ t('sourceCard.view') }}</button>
-      <button type="button" class="btn btn-sm" @click="fileInput?.click()"><Icon name="FileUp"  />{{ t('sourceCard.replace') }}</button>
+      <button type="button" class="xxd-btn" data-size="sm" :disabled="waiting" @click="emit('view', source)"><Icon name="Eye" :size="16" /><span>{{ t('sourceCard.view') }}</span></button>
+      <button type="button" class="xxd-btn" data-size="sm" @click="fileInput?.click()"><Icon name="FileUp" :size="16" /><span>{{ t('sourceCard.replace') }}</span></button>
       <span class="spacer"></span>
-      <button type="button" class="icon-btn sm danger" :aria-label="t('sourceCard.remove')" @click="remove"><Icon name="Trash"  /></button>
+      <button type="button" class="xxd-btn danger" data-variant="ghost" data-icon-only data-size="sm" :aria-label="t('sourceCard.remove')" @click="remove"><Icon name="Trash" :size="16" /></button>
       <input ref="fileInput" type="file" accept=".yaml,.yml,.txt" hidden @change="replace(($event.target as HTMLInputElement).files)" />
     </footer>
   </article>
 </template>
 
 <style scoped>
-.source-card { display: flex; flex-direction: column; gap: 10px; }
+.source-card { display: flex; flex-direction: column; gap: var(--space-3); }
 .source-card.is-waiting { border-style: dashed; }
-.sc-head { display: flex; align-items: center; gap: 8px; }
-.sc-title { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
-.sc-title h3 { margin: 0; font-family: var(--font-title); font-size: 19px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-head { display: flex; align-items: center; gap: var(--space-2); }
+.sc-title { display: flex; align-items: center; gap: var(--space-1); flex: 1; min-width: 0; }
+.sc-title h3 { margin: 0; overflow: hidden; font: var(--weight-strong) var(--text-lg) / var(--leading-md) var(--font-title); text-overflow: ellipsis; white-space: nowrap; }
 .rename { flex: 1; }
-.rename .input { min-height: 34px; padding: 4px 8px; font-weight: 700; }
-.sc-error { margin: -4px 0 0; color: var(--notice-error-ink); font-size: 12px; }
-.sc-file { margin: -6px 0 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rename .xxd-input { height: var(--control-h-sm); font-weight: var(--weight-medium); }
+.sc-error { margin: 0; color: var(--danger); font-size: var(--text-xs); line-height: var(--leading-sm); }
+/* The file name belongs to the title: closer to it than to the counts. */
+.sc-file { margin: calc(-1 * var(--space-2)) 0 0; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
 .sc-wait { margin: 0; }
-.sc-counts { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; border: 1px solid var(--line); }
-.sc-counts div { display: flex; flex-direction: column; justify-content: space-between; padding: 8px 10px; border-inline-end: 1px solid var(--line); }
-.sc-counts div:last-child { border-inline-end: 0; }
-.sc-counts dt { color: var(--muted); font-size: 11px; font-weight: 700; }
-.sc-counts dd { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.2; }
-.sc-regions { display: flex; flex-wrap: wrap; gap: 4px; min-height: 24px; }
-.sc-actions { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 4px; }
-.icon-btn.sm { width: 30px; height: 30px; }
-.icon-btn.sm svg { width: 15px; height: 15px; }
-.icon-btn:disabled { opacity: 0.3; }
-.icon-btn.danger:hover { color: var(--notice-error-ink); background: var(--notice-error-bg); }
+/* Counts: three columns separated by space, not a box inside the card. */
+.sc-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin: 0; }
+.sc-counts div { display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-0-5); }
+.sc-counts dt { color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-xs); }
+.sc-counts dd { margin: 0; font: var(--weight-strong) var(--text-xl) / var(--leading-lg) var(--font-body); }
+.sc-regions { display: flex; flex-wrap: wrap; gap: var(--space-1); min-height: 20px; }
+.sc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1-5); margin-top: auto; }
+/* Button labels never shrink: the row wraps instead. */
+.sc-actions .xxd-btn { flex: none; }
+.danger:hover:not(:disabled) { color: var(--danger); }
 .order { gap: 0; }
 </style>

@@ -62,7 +62,6 @@ function resetRegion(id: string) {
   <div class="page">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('basePage.eyebrow') }}</p>
         <h1 class="page-title">{{ t('nav.base') }}</h1>
         <p class="page-lede">{{ t('basePage.lede') }}</p>
       </div>
@@ -74,8 +73,8 @@ function resetRegion(id: string) {
         <p class="section-note">{{ t('basePage.outputNote', { example: exampleGroupName(store.settings.outputLocale) }) }}</p>
       </div>
       <div class="grid locales">
-        <label v-for="l in LOCALES" :key="l.id" class="check card-check">
-          <input v-model="store.settings.outputLocale" type="radio" name="output-locale" :value="l.id" />
+        <label v-for="l in LOCALES" :key="l.id" class="xxd-choice card-check">
+          <input class="xxd-radio" v-model="store.settings.outputLocale" type="radio" name="output-locale" :value="l.id" />
           <span class="check-label"><strong :lang="l.id">{{ l.name }}</strong><small :dir="l.dir">{{ exampleGroupName(l.id) }}</small></span>
         </label>
       </div>
@@ -84,49 +83,49 @@ function resetRegion(id: string) {
     <section class="section">
       <div class="section-head"><h2 class="section-title">{{ t('basePage.templateTitle') }}</h2></div>
       <div class="grid templates">
-        <label v-for="tpl in TEMPLATES" :key="tpl.id" class="check card-check">
-          <input v-model="base.templateId" type="radio" name="template" :value="tpl.id" />
+        <label v-for="tpl in TEMPLATES" :key="tpl.id" class="xxd-choice card-check">
+          <input class="xxd-radio" v-model="base.templateId" type="radio" name="template" :value="tpl.id" />
           <span class="check-label"><strong>{{ tpl.label }}</strong><small>{{ tpl.description }}</small></span>
         </label>
       </div>
 
       <div v-if="base.templateId === 'custom'" class="stack custom">
         <div class="row">
-          <button type="button" class="btn btn-sm" @click="fileInput?.click()"><Icon name="FileUp"  />{{ t('basePage.importBase') }}</button>
-          <button type="button" class="btn btn-sm btn-quiet" @click="startFromTemplate">{{ t('basePage.fromTemplate') }}</button>
+          <button type="button" class="xxd-btn" data-size="sm" @click="fileInput?.click()"><Icon name="FileUp" :size="16" /><span>{{ t('basePage.importBase') }}</span></button>
+          <button type="button" class="xxd-btn" data-size="sm" data-variant="ghost" @click="startFromTemplate">{{ t('basePage.fromTemplate') }}</button>
           <input ref="fileInput" type="file" accept=".yaml,.yml" hidden @change="importBase(($event.target as HTMLInputElement).files)" />
         </div>
-        <textarea v-model="base.customYaml" class="textarea" dir="ltr" rows="16" spellcheck="false" placeholder="mixed-port: 7890&#10;dns:&#10;  enable: true"></textarea>
-        <label class="check">
-          <input v-model="base.mergeCustomRules" type="checkbox" />
+        <textarea v-model="base.customYaml" class="xxd-textarea" dir="ltr" rows="16" spellcheck="false" placeholder="mixed-port: 7890&#10;dns:&#10;  enable: true"></textarea>
+        <label class="xxd-choice">
+          <input class="xxd-check" v-model="base.mergeCustomRules" type="checkbox" />
           <span class="check-label"><strong>{{ t('basePage.mergeRules') }}</strong><small>{{ t('basePage.mergeRulesHint') }}</small></span>
         </label>
       </div>
       <details v-else class="preview">
         <summary>{{ t('basePage.viewTemplate') }}</summary>
-        <pre class="code" dir="ltr">{{ preview }}</pre>
+        <pre class="xxd-code" dir="ltr">{{ preview }}</pre>
       </details>
     </section>
 
     <section class="section">
       <div class="section-head"><h2 class="section-title">{{ t('basePage.testTitle') }}</h2><p class="section-note">{{ t('basePage.testNote') }}</p></div>
       <div class="grid params">
-        <label class="field"><span>{{ t('basePage.testUrl') }}</span><input v-model.trim="strat.testUrl" class="input mono" dir="ltr" /></label>
-        <label class="field"><span>{{ t('basePage.interval') }}</span><input v-model.number="strat.interval" class="input num" type="number" min="30" step="30" /></label>
-        <label class="field"><span>{{ t('basePage.tolerance') }}</span><input v-model.number="strat.tolerance" class="input num" type="number" min="0" step="10" /></label>
+        <label class="xxd-field"><span class="xxd-label">{{ t('basePage.testUrl') }}</span><input v-model.trim="strat.testUrl" class="xxd-input mono" dir="ltr" /></label>
+        <label class="xxd-field"><span class="xxd-label">{{ t('basePage.interval') }}</span><input v-model.number="strat.interval" class="xxd-input num" type="number" min="30" step="30" /></label>
+        <label class="xxd-field"><span class="xxd-label">{{ t('basePage.tolerance') }}</span><input v-model.number="strat.tolerance" class="xxd-input num" type="number" min="0" step="10" /></label>
       </div>
     </section>
 
     <section class="section">
       <div class="section-head"><h2 class="section-title">{{ t('basePage.mirrorTitle') }}</h2><p class="section-note">{{ t('basePage.mirrorNote') }}</p></div>
       <div class="grid templates">
-        <label v-for="(m, id) in MIRRORS" :key="id" class="check card-check">
-          <input v-model="store.settings.rules.mirror" type="radio" name="mirror" :value="id as MirrorId" />
+        <label v-for="(m, id) in MIRRORS" :key="id" class="xxd-choice card-check">
+          <input class="xxd-radio" v-model="store.settings.rules.mirror" type="radio" name="mirror" :value="id as MirrorId" />
           <span class="check-label"><strong>{{ m.label }}</strong><small class="mono" dir="ltr">{{ m.root }}</small></span>
         </label>
       </div>
-      <label class="check direct-check">
-        <input v-model="store.settings.rules.downloadDirect" type="checkbox" />
+      <label class="xxd-choice direct-check">
+        <input class="xxd-check" v-model="store.settings.rules.downloadDirect" type="checkbox" />
         <span class="check-label"><strong>{{ t('basePage.downloadDirect') }}</strong><small>{{ t('basePage.downloadDirectHint') }}</small></span>
       </label>
     </section>
@@ -134,7 +133,7 @@ function resetRegion(id: string) {
     <section class="section">
       <div class="section-head">
         <h2 class="section-title">{{ t('basePage.regionsTitle') }}</h2>
-        <button type="button" class="btn btn-sm" :aria-expanded="showRegions" @click="showRegions = !showRegions">
+        <button type="button" class="xxd-btn" data-size="sm" :aria-expanded="showRegions" @click="showRegions = !showRegions">
           {{ showRegions ? t('common.collapse') : t('basePage.editRegions') }}
         </button>
       </div>
@@ -144,10 +143,10 @@ function resetRegion(id: string) {
           <div class="row">
             <strong>{{ r.icon }} {{ regionName(r) }}</strong>
             <span class="spacer"></span>
-            <label class="prio"><span class="muted">{{ t('basePage.priority') }}</span><input v-model.number="r.priority" class="input num" type="number" /></label>
-            <button type="button" class="icon-btn" :aria-label="t('common.reset')" :title="t('common.reset')" @click="resetRegion(r.id)"><Icon name="RotateCcw"  /></button>
+            <label class="prio"><span class="muted">{{ t('basePage.priority') }}</span><input v-model.number="r.priority" class="xxd-input num" type="number" /></label>
+            <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('common.reset')" :title="t('common.reset')" @click="resetRegion(r.id)"><Icon name="RotateCcw" :size="16" /></button>
           </div>
-          <textarea class="textarea" dir="ltr" rows="5" spellcheck="false" :value="r.patterns.join('\n')" @change="setPatterns(r.id, ($event.target as HTMLTextAreaElement).value)"></textarea>
+          <textarea class="xxd-textarea" dir="ltr" rows="5" spellcheck="false" :value="r.patterns.join('\n')" @change="setPatterns(r.id, ($event.target as HTMLTextAreaElement).value)"></textarea>
           <p v-for="p in r.patterns.filter((p) => bad.has(`${r.id}|${p}`))" :key="p" class="bad">{{ t('basePage.invalidPattern', { pattern: p }) }}</p>
         </div>
       </div>
@@ -156,22 +155,19 @@ function resetRegion(id: string) {
 </template>
 
 <style scoped>
-.templates { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
-.locales { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
-.card-check { border: 1px solid var(--line); background: var(--panel); padding: 12px; }
-.card-check:has(input:checked) { border-color: var(--ink); }
+.templates { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-2); }
+.locales { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--space-2); }
 .card-check small.mono { word-break: break-all; }
-.custom { margin-top: 14px; }
-.direct-check { margin-top: 10px; }
-.preview { margin-top: 12px; }
-.preview summary { cursor: pointer; font-weight: 700; margin-bottom: 8px; }
-.preview .code { max-height: 420px; }
+.custom { margin-top: var(--space-3); }
+.direct-check { margin-top: var(--space-3); }
+.preview { margin-top: var(--space-2); }
+.preview .xxd-code { max-height: 420px; overflow: auto; }
 .params { grid-template-columns: 2fr 1fr 1fr; }
-.regions { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); margin-top: 12px; }
-.region-card { display: grid; gap: 8px; padding: 12px; }
-.region-card .textarea { min-height: 110px; }
-.prio { display: flex; align-items: center; gap: 6px; font-size: 12px; }
-.prio .input { width: 72px; min-height: 30px; padding: 2px 8px; }
-.bad { margin: 0; color: var(--notice-error-ink); font-size: 12px; }
-@media (max-width: 700px) { .params { grid-template-columns: 1fr; } }
+.regions { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); margin-top: var(--space-3); }
+.region-card { display: grid; gap: var(--space-2); padding: var(--space-3); }
+.region-card .xxd-textarea { min-height: 110px; }
+.prio { display: flex; align-items: center; gap: var(--space-1-5); font-size: var(--text-xs); }
+.prio .xxd-input { width: 72px; }
+.bad { margin: 0; color: var(--danger); font-size: var(--text-xs); }
+@media (max-width: 640px) { .params { grid-template-columns: minmax(0, 1fr); } }
 </style>

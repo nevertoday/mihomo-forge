@@ -38,7 +38,7 @@ function toggleModule(id: ModuleId) {
           <span class="preset-head">
             <span class="dot" aria-hidden="true"></span>
             <strong>{{ t(`presetNames.${p.id}`) }}</strong>
-            <span v-if="p.id === 'standard'" class="badge">{{ t('presetNames.recommended') }}</span>
+            <span v-if="p.id === 'standard'" class="xxd-badge" data-tone="success">{{ t('presetNames.recommended') }}</span>
           </span>
           <small>{{ t(`presets.${p.id}`) }}</small>
         </button>
@@ -64,42 +64,36 @@ function toggleModule(id: ModuleId) {
 </template>
 
 <style scoped>
-.preset-picker { display: grid; gap: 24px; }
-.block { display: grid; gap: 8px; justify-items: start; }
+.preset-picker { display: grid; gap: var(--space-6); }
+.block { display: grid; gap: var(--space-2); justify-items: start; }
 .block .eyebrow { margin: 0; }
-.presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; width: 100%; }
-.preset { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--line); background: var(--panel); text-align: start; }
-.preset:hover { border-color: var(--line-strong); }
-.preset[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.preset-head { display: flex; align-items: center; gap: 8px; }
-.preset-head strong { font-size: 15px; }
-.preset small { color: var(--muted); font-size: 12px; line-height: 1.5; }
-.dot { flex: none; width: 16px; height: 16px; border: 1.5px solid var(--line-strong); border-radius: 50%; display: grid; place-items: center; }
-.preset[aria-checked="true"] .dot { border-color: var(--ink); background: var(--ink); }
-.preset[aria-checked="true"] .dot::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--paper); }
-.badge { font-size: 11px; font-weight: 800; padding: 1px 6px; background: var(--notice-success-bg); color: var(--notice-success-ink); border: 1px solid var(--notice-success-border); }
-.modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; width: 100%; }
-.module {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px;
+.presets, .modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--space-2); width: 100%; }
+/* Tiles: selection is one quiet fill; the radio / checkbox mark (kit style) says which. */
+.preset, .module {
+  padding: var(--space-3);
   border: 1px solid var(--line);
-  background: var(--panel);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--weight-regular) var(--text-sm) / var(--leading-sm) var(--font-body);
   text-align: start;
+  cursor: pointer;
+  transition: background-color var(--motion-quick) ease;
 }
-.module:hover { border-color: var(--line-strong); }
-.module[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.box { flex: none; width: 16px; height: 16px; margin-top: 3px; border: 1.5px solid var(--line-strong); display: grid; place-items: center; }
-.module[aria-pressed="true"] .box { border-color: var(--ink); background: var(--ink); }
-.module[aria-pressed="true"] .box::after {
-  content: "";
-  width: 8px;
-  height: 4px;
-  border-left: 2px solid var(--paper);
-  border-bottom: 2px solid var(--paper);
-  transform: translateY(-1px) rotate(-45deg);
-}
-.module-copy { display: grid; gap: 2px; }
-.module-copy small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.preset:hover, .module:hover { background: var(--wash); transition-duration: 0s; }
+.preset[aria-checked="true"], .module[aria-pressed="true"] { background: var(--selected-bg); }
+.preset { display: grid; gap: var(--space-1); }
+.preset-head { display: flex; align-items: center; gap: var(--space-2); }
+.preset-head strong, .module-copy strong { font-weight: var(--weight-medium); }
+.preset small, .module-copy small { color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+.module { display: flex; align-items: flex-start; gap: var(--space-2); }
+.module-copy { display: grid; gap: var(--space-0-5); }
+/* Marks drawn like the kit's .xxd-radio / .xxd-check (buttons can't hold real inputs). */
+.dot, .box { flex: none; display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--line-control); background: var(--paper); }
+.dot { border-radius: var(--r-circle); }
+.box { margin-top: var(--space-0-5); border-radius: var(--r-xs); }
+.preset[aria-checked="true"] .dot { border-color: var(--action-fill); background: var(--action-fill); }
+.preset[aria-checked="true"] .dot::after { content: ""; width: 6px; height: 6px; border-radius: var(--r-circle); background: var(--on-action); }
+.module[aria-pressed="true"] .box { border-color: var(--action-fill); background: var(--action-fill); }
+.module[aria-pressed="true"] .box::after { content: ""; width: 8px; height: 4px; border-bottom: 1.5px solid var(--on-action); border-left: 1.5px solid var(--on-action); transform: translateY(-1px) rotate(-45deg); }
 </style>

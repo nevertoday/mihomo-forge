@@ -8,159 +8,119 @@ import { railExpanded, toggleRail } from './rail'
 
 /** Like the reference rail: clicking empty rail space toggles it; controls keep their own action. */
 function onRailClick(e: MouseEvent) {
-  if (matchMedia('(max-width: 700px)').matches) return
+  if (matchMedia('(max-width: 640px)').matches) return
   if ((e.target as HTMLElement).closest('a, button')) return
   toggleRail()
 }
 </script>
 
 <template>
-  <aside class="rail" :aria-label="t('nav.label')" @click="onRailClick">
-    <a class="rail-logo" href="#/overview" :aria-label="t('nav.home')" @click.prevent="go('overview')">
-      <span class="rail-symbol"><LogoMark /></span>
-      <strong>Mihomo Forge</strong>
-    </a>
-    <nav class="rail-nav">
+  <!-- 小小东 UI Kit sidebar: expanded with labels, or collapsed to icons (data-collapsed, instant; labels fade). -->
+  <aside class="xxd-sidebar rail" :data-collapsed="railExpanded ? undefined : ''" :aria-label="t('nav.label')" @click="onRailClick">
+    <div class="xxd-sidebar__head">
+      <a class="xxd-logo rail-logo" href="#/overview" :aria-label="t('nav.home')" @click.prevent="go('overview')">
+        <LogoMark /><span data-sidebar-hide>Mihomo Forge</span>
+      </a>
+    </div>
+    <nav class="xxd-sidebar__body">
       <button
         v-for="item in NAV_ITEMS"
         :key="item.id"
         type="button"
-        class="rail-item"
+        class="xxd-sidebar__item"
         :aria-current="currentView === item.id ? 'page' : undefined"
-        :aria-label="t(`nav.${item.id}`)"
         :data-tooltip="t(`nav.${item.id}`)"
         :data-view="item.id"
         @click="go(item.id)"
       >
-        <span class="rail-symbol"><Icon :name="item.icon" :size="20" /></span>
-        <em>{{ t(`nav.${item.id}`) }}</em>
+        <Icon :name="item.icon" /><span>{{ t(`nav.${item.id}`) }}</span>
       </button>
     </nav>
-    <div class="rail-foot">
-      <a class="rail-item" :href="REPO_URL" target="_blank" rel="noopener" :aria-label="t('nav.repo')" :data-tooltip="t('nav.repo')">
-        <span class="rail-symbol"><Icon name="Github" :size="20" /></span>
-        <em>GitHub</em>
+    <div class="xxd-sidebar__foot">
+      <a class="xxd-sidebar__item" :href="REPO_URL" target="_blank" rel="noopener" :data-tooltip="t('nav.repo')">
+        <Icon name="Github" /><span>GitHub</span><!-- xxd-ignore: brand mark keeps its own drawing (design principles §7) -->
       </a>
       <button
         type="button"
-        class="rail-item"
+        class="xxd-btn rail-toggle"
+        data-variant="ghost"
+        data-icon-only
+        data-size="sm"
         :aria-expanded="railExpanded"
         :aria-label="railExpanded ? t('nav.collapse') : t('nav.expand')"
         :data-tooltip="railExpanded ? t('nav.collapse') : t('nav.expand')"
         @click="toggleRail"
       >
-        <span class="rail-symbol"><Icon name="PanelLeft" :size="20" /></span>
-        <em>{{ t('nav.collapse') }}</em>
+        <Icon name="PanelLeft" :size="16" />
       </button>
     </div>
   </aside>
 </template>
 
 <style scoped>
-/* Geometry follows the reference rail: 56px collapsed / 188px expanded, 40px items, 32px marks. */
 .rail {
-  --item: 40px;
-  --mark: 32px;
+  --sidebar-w: var(--rail-width);
   position: fixed;
-  z-index: 40;
+  z-index: var(--z-dock);
   inset-block: 0;
   inset-inline-start: 0;
-  width: var(--rail-width);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 12px;
-  overflow: hidden;
-  border-inline-end: 1px solid var(--line);
-  background: var(--rail-bg);
-  cursor: pointer;
-  transition: width 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  height: 100dvh;
 }
-.rail-nav { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
-.rail-foot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; margin-top: auto; }
-.rail-logo, .rail-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: var(--mark) minmax(0, 1fr);
-  column-gap: 10px;
-  align-items: center;
-  width: calc(100% + 8px);
-  min-width: 0;
-  min-height: var(--item);
-  margin-inline-start: -4px;
-  padding: 0 4px;
-  border: 0;
-  color: var(--muted);
-  background: transparent;
-  text-align: start;
-  text-decoration: none;
-  cursor: pointer;
-}
-.rail-logo { margin-bottom: 8px; color: var(--ink); }
-.rail-symbol { display: grid; place-items: center; width: var(--mark); height: var(--mark); }
-.rail-logo :deep(.logo-mark) { width: 28px; height: 28px; }
-.rail-logo strong { font-family: var(--font-title); font-size: 14px; font-weight: 900; white-space: nowrap; }
-.rail-item em {
-  min-width: 0;
-  overflow: hidden;
-  font-style: normal;
-  font-size: 12px;
-  font-weight: var(--navigation-font-weight);
-  line-height: 1.3;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.rail-logo strong, .rail-item em { opacity: 1; transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1); }
-:root[data-rail="collapsed"] .rail-logo strong,
-:root[data-rail="collapsed"] .rail-item em { opacity: 0; }
+.xxd-sidebar__head { padding-inline: var(--space-4); }
+.xxd-sidebar__body { display: grid; align-content: start; gap: var(--space-0-5); }
+.xxd-sidebar__foot { flex-wrap: wrap; gap: var(--space-0-5); padding: var(--space-2); }
+.rail-logo :deep(.logo-mark) { width: 24px; height: 24px; }
+/* The sidebar's own icons are 18px; ours go through <Icon>, which defaults to 18px too. */
+.xxd-sidebar__item > :deep(.ui-icon) { flex: none; }
+.rail-toggle { margin-inline-start: auto; }
+.xxd-sidebar[data-collapsed] .xxd-sidebar__head { justify-content: center; padding: 0; }
+.xxd-sidebar[data-collapsed] .rail-logo :deep(span) { display: none; }
+.xxd-sidebar[data-collapsed] .xxd-sidebar__foot { justify-content: center; }
+.xxd-sidebar[data-collapsed] .rail-toggle { margin-inline-start: 0; }
+/* Collapsed, the six items always fit: let their tooltips out of the scroll box. */
+.xxd-sidebar[data-collapsed] .xxd-sidebar__body { overflow: visible; }
 
-/* Selection changes color and background, never weight (reference navigation rule). */
-.rail-item:hover, .rail-item:focus-visible { color: var(--ink); }
-.rail-item[aria-current="page"] { color: var(--ink); background: var(--rail-active-track); }
-
-/* Collapsed: a compact tooltip names each destination. */
-.rail-item::after {
+/* Collapsed: a tooltip names each destination (tooltip type: 11px, ink on paper-raised inverse). */
+.rail [data-tooltip] { position: relative; }
+.rail [data-tooltip]::before {
   content: attr(data-tooltip);
   position: absolute;
-  inset-inline-start: calc(100% + 14px);
+  inset-inline-start: calc(100% + var(--space-3));
   top: 50%;
-  z-index: 2;
-  padding: 4px 10px;
-  transform: translateY(-50%);
+  z-index: var(--z-popover);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--r-xs);
   background: var(--ink);
-  color: var(--paper);
-  font-size: 12px;
-  font-weight: var(--navigation-font-weight);
+  color: var(--on-ink);
+  font: var(--weight-medium) var(--text-2xs) / var(--leading-xs) var(--font-body);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
+  transform: translateY(-50%);
 }
-:root[data-rail="collapsed"] .rail { overflow: visible; }
-:root[data-rail="collapsed"] .rail-item:hover::after,
-:root[data-rail="collapsed"] .rail-item:focus-visible::after { opacity: 1; visibility: visible; }
+.xxd-sidebar[data-collapsed] [data-tooltip]:is(:hover, :focus-visible)::before { opacity: 1; visibility: visible; }
 
 /*
  * Hover / focus motion in the 小小东 rail vocabulary: strokes draw themselves (pathLength 100),
  * blocks assemble in sequence, parts slide a little. 480–760ms, one shared easing curve.
  */
-.rail-symbol :deep(svg), .rail-symbol :deep(svg > *) { transform-box: fill-box; transform-origin: center; }
-.rail-item[data-view="overview"]:is(:hover, :focus-visible) :deep(svg > path) { animation: rail-home-draw 720ms var(--ease) both; }
-.rail-item[data-view="overview"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { animation-delay: 80ms; }
-.rail-item[data-view="sources"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(1)) { animation: rail-lift 720ms var(--ease) both; }
-.rail-item[data-view="sources"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { --slide: -2.5px; animation: rail-slide-draw 560ms 100ms var(--ease) both; }
-.rail-item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > rect) { animation: rail-module-assemble 640ms var(--ease) both; }
-.rail-item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > rect:nth-of-type(2)) { animation-delay: 80ms; }
-.rail-item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > rect:nth-of-type(3)) { animation-delay: 160ms; }
-.rail-item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > path) { animation: rail-stroke-draw 480ms 240ms var(--ease) both; }
-.rail-item[data-view="rules"]:is(:hover, :focus-visible) :deep(svg > path) { animation: rail-stroke-draw 520ms var(--ease) both; }
-.rail-item[data-view="rules"]:is(:hover, :focus-visible) :deep(svg > rect) { animation: rail-module-assemble 640ms 80ms var(--ease) both; }
-.rail-item[data-view="rules"]:is(:hover, :focus-visible) :deep(svg > rect:nth-of-type(2)) { animation-delay: 160ms; }
-.rail-item[data-view="base"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(1)) { animation: rail-stroke-draw 520ms var(--ease) both; }
-.rail-item[data-view="base"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { --slide: 2px; animation: rail-slide 640ms 80ms var(--ease) both; }
-.rail-item[data-view="build"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(1)) { animation: rail-drop 640ms var(--ease) both; }
-.rail-item[data-view="build"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { animation: rail-lift 720ms 220ms var(--ease) both; }
-.rail { --ease: cubic-bezier(0.22, 1, 0.36, 1); }
+.xxd-sidebar__item :deep(svg), .xxd-sidebar__item :deep(svg > *) { transform-box: fill-box; transform-origin: center; }
+.xxd-sidebar__item[data-view="overview"]:is(:hover, :focus-visible) :deep(svg > path) { animation: rail-home-draw 720ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="overview"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { animation-delay: 80ms; }
+.xxd-sidebar__item[data-view="sources"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(1)) { animation: rail-lift 720ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="sources"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { --slide: -2.5px; animation: rail-slide-draw 560ms 100ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > rect) { animation: rail-module-assemble 640ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > rect:nth-of-type(2)) { animation-delay: 80ms; }
+.xxd-sidebar__item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > rect:nth-of-type(3)) { animation-delay: 160ms; }
+.xxd-sidebar__item[data-view="strategies"]:is(:hover, :focus-visible) :deep(svg > path) { animation: rail-stroke-draw 480ms 240ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="rules"]:is(:hover, :focus-visible) :deep(svg > path) { animation: rail-stroke-draw 520ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="rules"]:is(:hover, :focus-visible) :deep(svg > rect) { animation: rail-module-assemble 640ms 80ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="rules"]:is(:hover, :focus-visible) :deep(svg > rect:nth-of-type(2)) { animation-delay: 160ms; }
+.xxd-sidebar__item[data-view="base"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(1)) { animation: rail-stroke-draw 520ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="base"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { --slide: 2px; animation: rail-slide 640ms 80ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="build"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(1)) { animation: rail-drop 640ms var(--ease-out-quint) both; }
+.xxd-sidebar__item[data-view="build"]:is(:hover, :focus-visible) :deep(svg > path:nth-of-type(2)) { animation: rail-lift 720ms 220ms var(--ease-out-quint) both; }
 
 @keyframes rail-home-draw {
   0% { stroke-dasharray: 100; stroke-dashoffset: 100; transform: translateY(1px) scale(0.94); opacity: 0.22; }
@@ -193,34 +153,37 @@ function onRailClick(e: MouseEvent) {
   100% { stroke-dasharray: 100; stroke-dashoffset: 0; transform: translateY(0); opacity: 1; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 640px) {
+  /* Phones: the destinations become a bottom tab bar; logo, GitHub and the toggle step aside. */
   .rail {
     inset: auto 0 0 0;
     width: 100%;
     height: calc(60px + env(safe-area-inset-bottom));
-    flex-direction: row;
-    padding: 0 0 env(safe-area-inset-bottom);
-    border-inline-end: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-right: 0;
     border-top: 1px solid var(--line);
-    cursor: auto;
   }
-  .rail-logo, .rail-foot { display: none; }
-  .rail-nav { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; width: 100%; }
-  .rail-item { grid-template-columns: 1fr; justify-items: center; align-content: center; row-gap: 2px; width: 100%; height: 60px; margin: 0; padding: 0; }
-  .rail-item em,
-  :root[data-rail="collapsed"] .rail-item em { width: 100%; font-size: 10px; text-align: center; opacity: 1; }
-  .rail-symbol { width: auto; height: auto; }
-  .rail-item::after { display: none; }
-}
-
-/* Phones: no hover motion, just a press response (as on the reference). */
-@media (max-width: 700px) {
-  .rail-item:is(:hover, :focus-visible) :deep(svg > *) { animation: none !important; }
-  .rail-item:active .rail-symbol :deep(svg) { transform: translateY(1px) scale(0.9); }
+  .xxd-sidebar__head, .xxd-sidebar__foot { display: none; }
+  .xxd-sidebar__body { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; padding: 0; overflow: visible; }
+  .xxd-sidebar__item,
+  .xxd-sidebar[data-collapsed] .xxd-sidebar__item {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-0-5);
+    height: 60px;
+    padding: 0;
+    border-radius: 0;
+    font-size: var(--text-2xs);
+    line-height: var(--leading-xs);
+  }
+  .xxd-sidebar__item > span,
+  .xxd-sidebar[data-collapsed] .xxd-sidebar__item > span { position: static; width: 100%; flex: none; text-align: center; opacity: 1; }
+  .rail [data-tooltip]::before { display: none; }
+  .xxd-sidebar__item:is(:hover, :focus-visible) :deep(svg > *) { animation: none !important; }
+  .xxd-sidebar__item:active :deep(svg) { transform: translateY(1px) scale(0.9); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rail, .rail-logo strong, .rail-item em { transition: none; }
-  .rail-item :deep(svg), .rail-item :deep(svg > *) { animation: none !important; transform: none !important; opacity: 1; }
+  .xxd-sidebar__item :deep(svg), .xxd-sidebar__item :deep(svg > *) { animation: none !important; transform: none !important; opacity: 1; }
 }
 </style>

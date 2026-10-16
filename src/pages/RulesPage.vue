@@ -38,11 +38,10 @@ function toggle(service: RuleService) {
   <div class="page">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('rulesPage.eyebrow') }}</p>
         <h1 class="page-title">{{ t('nav.rules') }}</h1>
         <p class="page-lede">{{ t('rulesPage.lede') }}</p>
       </div>
-      <p class="chip chip-dark">{{ t('count.services', { n: enabledIds.size }) }} · {{ t('count.rules', { n: store.build.stats.rules }) }}</p>
+      <p class="xxd-badge">{{ t('count.services', { n: enabledIds.size }) }} · {{ t('count.rules', { n: store.build.stats.rules }) }}</p>
     </header>
 
     <section class="section">
@@ -60,19 +59,20 @@ function toggle(service: RuleService) {
             :class="{ 'is-on': enabledIds.has(s.id), 'is-active': selected.id === s.id }"
           >
             <button type="button" class="svc-main" :aria-current="selected.id === s.id ? 'true' : undefined" @click="selectedId = s.id">
-              <span class="svc-name">{{ s.icon }} {{ serviceName(s) }}<small v-if="s.optional" class="opt">{{ t('service.optional') }}</small></span>
+              <span class="svc-name">{{ s.icon }} {{ serviceName(s) }}<span v-if="s.optional" class="xxd-badge" data-variant="outline">{{ t('service.optional') }}</span></span>
               <small class="svc-default"><bdi>{{ enabledIds.has(s.id) ? (s.fixedTarget ?? defaultName(s.id) ?? '') : t('rulesPage.notEnabled') }}</bdi></small>
             </button>
             <span v-if="s.required" class="always">{{ t('rulesPage.alwaysOn') }}</span>
-            <button
+            <input
               v-else
-              type="button"
-              class="switch"
+              type="checkbox"
+              class="xxd-switch"
               role="switch"
-              :aria-checked="enabledIds.has(s.id)"
+              data-size="sm"
+              :checked="enabledIds.has(s.id)"
               :aria-label="enabledIds.has(s.id) ? t('rulesPage.disable', { name: serviceName(s) }) : t('rulesPage.enable', { name: serviceName(s) })"
-              @click="toggle(s)"
-            ></button>
+              @change="toggle(s)"
+            />
           </div>
         </div>
       </nav>
@@ -84,25 +84,21 @@ function toggle(service: RuleService) {
 </template>
 
 <style scoped>
-.services-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 28px; align-items: start; }
-.service-list { position: sticky; top: 16px; max-height: calc(100dvh - var(--topbar-height) - 32px); overflow: auto; border: 1px solid var(--line); background: var(--panel); padding: 12px 0; }
-.svc-section { padding: 0 8px 10px; }
-.svc-section .eyebrow { margin: 6px 8px 4px; }
-.svc { display: flex; align-items: center; gap: 6px; padding-inline-end: 6px; border-inline-start: 2px solid transparent; }
-.svc.is-active { background: var(--active-wash); border-inline-start-color: var(--ink); }
-.svc-main { flex: 1; min-width: 0; display: grid; gap: 0; padding: 6px 8px; border: 0; background: transparent; text-align: start; }
-.svc-name { font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.services-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: var(--space-8); align-items: start; }
+.service-list { position: sticky; top: var(--space-4); max-height: calc(100dvh - 56px - var(--space-8)); overflow: auto; padding: var(--space-2); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--paper); }
+.svc-section + .svc-section { margin-top: var(--space-3); }
+.svc-section .eyebrow { margin: var(--space-1) var(--space-2); }
+/* A list: the selected row is one quiet fill (no side bar); enabled names are ink, others muted. */
+.svc { display: flex; align-items: center; gap: var(--space-2); padding-inline-end: var(--space-2); border-radius: var(--r-sm); }
+.svc:hover { background: var(--wash); }
+.svc.is-active { background: var(--selected-bg); }
+.svc-main { flex: 1; display: grid; min-width: 0; padding: var(--space-1-5) var(--space-2); border: 0; background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.svc-name { display: flex; align-items: center; gap: var(--space-1-5); color: var(--muted); font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body); }
 .svc.is-on .svc-name { color: var(--ink); }
-.svc-default { color: var(--muted); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.opt { font-size: 10px; font-weight: 800; padding: 0 4px; border: 1px solid var(--line-strong); color: var(--muted); }
-.switch { position: relative; flex: none; width: 30px; height: 18px; padding: 0; border: 1.5px solid var(--line-strong); background: var(--panel); }
-.switch::after { content: ""; position: absolute; top: 2px; inset-inline-start: 2px; width: 11px; height: 11px; background: var(--line-strong); transition: transform 140ms ease; }
-.switch[aria-checked="true"] { border-color: var(--ink); background: var(--ink); }
-.switch[aria-checked="true"]::after { transform: translateX(12px); background: var(--paper); }
-[dir="rtl"] .switch[aria-checked="true"]::after { transform: translateX(-12px); }
-.always { flex: none; font-size: 11px; font-weight: 700; color: var(--muted); }
-@media (max-width: 860px) {
-  .services-layout { grid-template-columns: 1fr; }
+.svc-default { overflow: hidden; color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-xs); text-overflow: ellipsis; white-space: nowrap; }
+.always { flex: none; color: var(--muted); font-size: var(--text-2xs); line-height: var(--leading-xs); }
+@media (max-width: 1024px) {
+  .services-layout { grid-template-columns: minmax(0, 1fr); }
   .service-list { position: static; max-height: 320px; }
 }
 </style>

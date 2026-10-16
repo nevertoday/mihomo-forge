@@ -80,8 +80,8 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
       <p class="section-note">{{ t('composite.note', { example }) }}</p>
     </header>
 
-    <div v-if="list.length" class="table-wrap">
-      <table class="table">
+    <div v-if="list.length" class="xxd-table-wrap">
+      <table class="xxd-table">
         <thead>
           <tr>
             <th>{{ t('composite.colGroup') }}</th>
@@ -97,53 +97,53 @@ const regionOf = (id: string) => store.settings.regions.find((r) => r.id === id)
             <td dir="auto"><strong>{{ builtByRef.get(`composite:${c.id}`)?.group.name ?? c.displayName ?? '—' }}</strong></td>
             <td dir="auto">{{ sourceName(c.sourceId) }}</td>
             <td>{{ regionOf(c.regionId)?.icon }} {{ regionOf(c.regionId) ? regionName(regionOf(c.regionId)!) : '' }}</td>
-            <td><span class="chip">{{ modeLabel(c.mode) }}</span></td>
+            <td><span class="xxd-badge">{{ modeLabel(c.mode) }}</span></td>
             <td class="num">{{ builtByRef.get(`composite:${c.id}`)?.nodeCount ?? 0 }}</td>
-            <td class="end"><button type="button" class="icon-btn" :aria-label="t('composite.remove')" @click="remove(c.id)"><Icon name="Trash"  /></button></td>
+            <td class="end"><button type="button" class="xxd-btn" data-variant="ghost" data-icon-only :aria-label="t('composite.remove')" @click="remove(c.id)"><Icon name="Trash" :size="16" /></button></td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <form v-if="open" class="card creator" @submit.prevent="add">
-      <label class="field">
-        <span>{{ t('composite.colSource') }}</span>
-        <select v-model="sourceId" class="select" required @change="regionId = ''">
+      <label class="xxd-field">
+        <span class="xxd-label">{{ t('composite.colSource') }}</span>
+        <span class="xxd-select"><select v-model="sourceId"  required @change="regionId = ''">
           <option value="" disabled>{{ t('composite.pickSource') }}</option>
           <option v-for="s in store.sources" :key="s.id" :value="s.id">{{ s.name }}</option>
-        </select>
+        </select></span>
       </label>
-      <label class="field">
-        <span>{{ t('composite.colRegion') }}</span>
-        <select v-model="regionId" class="select" required :disabled="!sourceId">
+      <label class="xxd-field">
+        <span class="xxd-label">{{ t('composite.colRegion') }}</span>
+        <span class="xxd-select"><select v-model="regionId"  required :disabled="!sourceId">
           <option value="" disabled>{{ t('composite.pickRegion') }}</option>
           <option v-for="r in regionsForSource" :key="r.id" :value="r.id">{{ r.icon }} {{ regionName(r) }} ({{ counts.get(`${sourceId}|${r.id}`) }})</option>
-        </select>
+        </select></span>
       </label>
-      <label class="field">
-        <span>{{ t('composite.colMode') }}</span>
-        <select v-model="mode" class="select">
+      <label class="xxd-field">
+        <span class="xxd-label">{{ t('composite.colMode') }}</span>
+        <span class="xxd-select"><select v-model="mode" >
           <option v-for="m in MODES" :key="m.id" :value="m.id">{{ m.label }}</option>
-        </select>
+        </select></span>
       </label>
-      <label class="field">
-        <span>{{ t('composite.nameOptional') }}</span>
-        <input v-model="displayName" class="input" dir="auto" maxlength="40" :placeholder="t('composite.namePlaceholder', { example })" />
+      <label class="xxd-field">
+        <span class="xxd-label">{{ t('composite.nameOptional') }}</span>
+        <input v-model="displayName" class="xxd-input" dir="auto" maxlength="40" :placeholder="t('composite.namePlaceholder', { example })" />
       </label>
       <div class="row creator-actions">
-        <button type="button" class="btn btn-cancel" @click="open = false">{{ t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary" :disabled="!sourceId || !regionId">{{ t('composite.create') }}</button>
+        <button type="button" class="xxd-btn ui-dialog-cancel" @click="open = false">{{ t('common.cancel') }}</button>
+        <button type="submit" class="xxd-btn" data-variant="primary" :disabled="!sourceId || !regionId">{{ t('composite.create') }}</button>
       </div>
     </form>
-    <button v-else type="button" class="btn add" :disabled="!store.sources.length" @click="open = true"><Icon name="Plus"  />{{ t('composite.add') }}</button>
+    <button v-else type="button" class="xxd-btn add" :disabled="!store.sources.length" @click="open = true"><Icon name="Plus" :size="16" /><span>{{ t('composite.add') }}</span></button>
   </section>
 </template>
 
 <style scoped>
-.composites { display: grid; gap: 12px; }
-.block-head { display: grid; gap: 2px; }
-.creator { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
+.composites { display: grid; gap: var(--space-3); }
+.block-head { display: grid; gap: var(--space-0-5); }
+.creator { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-3); align-items: end; }
 .creator-actions { grid-column: 1 / -1; justify-content: flex-end; }
-.add { justify-self: start; border-style: dashed; }
+.add { justify-self: start; }
 .end { text-align: end; }
 </style>

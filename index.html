@@ -6,39 +6,35 @@
     <meta name="description" content="隐私优先、浏览器本地运行的 Mihomo / OpenClash 配置工作台：把多个订阅 YAML 快照编译成一个完整 config.yaml。">
     <title>Mihomo Forge</title>
     <link rel="icon" href="./favicon.svg?v=anvil-tile" type="image/svg+xml">
+    <!-- 小小东 UI Kit: theme, corners and accent applied before first paint (xxd-ui sync updates these files). -->
+    <script src="/vendor/xxd/boot.js" data-key="mihomo-forge-ui" data-default-theme="system"></script>
     <script>
-      // Apply theme and rail width before first paint to avoid a flash.
+      // Rail width before first paint, so the layout doesn't jump.
       (() => {
-        let pref = 'system'
-        try { pref = localStorage.getItem('mihomo-forge-theme') || 'system' } catch {}
-        const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
         let rail = 'expanded'
         try { if (localStorage.getItem('mihomo-forge-rail') === 'collapsed') rail = 'collapsed' } catch {}
         document.documentElement.dataset.rail = rail
       })()
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&family=Noto+Serif+SC:wght@600;700;900&display=swap" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/vendor/xxd/xxd.css">
     <style>
-      .boot { --b: #fcfcfc; --r: #f9f9f9; --l: #e7e7ea; --s: #ededed; position: fixed; inset: 0; display: flex; background: var(--b); }
-      :root[data-theme="dark"] .boot { --b: #171612; --r: #1b1a16; --l: #34322b; --s: #2a2822; }
-      .boot-rail { flex: none; width: 188px; background: var(--r); border-right: 1px solid var(--l); }
+      /* Boot skeleton on the kit's tokens (xxd.css is already loaded above). */
+      .boot { position: fixed; inset: 0; display: flex; background: var(--bg); }
+      .boot-rail { flex: none; width: 216px; background: var(--bg); border-right: 1px solid var(--line); }
       :root[data-rail="collapsed"] .boot-rail { width: 56px; }
-      .boot-main { flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 0 40px; }
-      .boot-top { height: 56px; margin: 0 -40px 22px; border-bottom: 1px solid var(--l); }
-      .boot-line, .boot-block { display: block; height: 14px; background: var(--s); animation: boot-pulse 1.4s ease-in-out infinite; }
-      .boot-line.tall { height: 34px; }
-      .boot-block { height: 180px; margin-top: 18px; }
+      .boot-main { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); padding: 0 var(--space-8); }
+      .boot-top { height: 56px; margin: 0 calc(-1 * var(--space-8)) var(--space-6); border-bottom: 1px solid var(--line); }
+      .boot-line, .boot-block { display: block; height: 12px; background: var(--wash-strong); animation: boot-pulse 1.4s ease-in-out infinite; }
+      .boot-line.tall { height: 28px; }
+      .boot-block { height: 180px; margin-top: var(--space-4); }
       .w20 { width: 20%; } .w40 { width: 40%; } .w60 { width: 60%; }
       .boot-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
       @keyframes boot-pulse { 50% { opacity: 0.55; } }
-      @media (max-width: 700px) { .boot-rail { display: none; } .boot-main { padding: 0 16px; } .boot-top { margin: 0 -16px 22px; } }
+      @media (max-width: 640px) { .boot-rail { display: none; } .boot-main { padding: 0 var(--space-4); } .boot-top { margin: 0 calc(-1 * var(--space-4)) var(--space-6); } }
       @media (prefers-reduced-motion: reduce) { .boot-line, .boot-block { animation: none; } }
     </style>
   </head>
-  <body>
+  <body class="xxd-page">
     <!-- Boot skeleton: previews the final layout until the app mounts (never a blank page). -->
     <div id="app">
       <div class="boot" aria-busy="true">

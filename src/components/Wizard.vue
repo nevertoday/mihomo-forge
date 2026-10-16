@@ -58,18 +58,18 @@ function next() {
       <p class="eyebrow">{{ t('wizard.step', { n: step }) }}</p>
       <h1 class="page-title">{{ current.title }}</h1>
       <p class="page-lede">{{ current.lede }}</p>
-      <p v-if="step === 3 || step === 4" class="keep-default"><Icon name="Sparkles" aria-hidden="true" />{{ t('wizard.keepDefault') }}</p>
+      <p v-if="step === 3 || step === 4" class="keep-default"><Icon name="Sparkles" :size="14" />{{ t('wizard.keepDefault') }}</p>
     </header>
 
     <div v-if="step === 1" class="stack">
       <PrivacyNote />
       <DropZone />
       <div v-if="store.sources.length" class="row imported">
-        <span class="chip" v-for="s in store.sources" :key="s.id"><bdi>{{ s.name }}</bdi> · <span class="num">{{ s.nodes.length }}</span></span>
+        <span class="xxd-badge" v-for="s in store.sources" :key="s.id"><bdi>{{ s.name }}</bdi> · <span class="num">{{ s.nodes.length }}</span></span>
       </div>
       <p class="muted alt">
         {{ t('wizard.haveProject') }}
-        <button type="button" class="link" @click="projectInput?.click()"><Icon name="FileUp"  />{{ t('wizard.importProject') }}</button>
+        <button type="button" class="xxd-link link" @click="projectInput?.click()"><Icon name="FileUp" :size="16" />{{ t('wizard.importProject') }}</button>
         <input ref="projectInput" type="file" accept=".json" hidden @change="onProject(($event.target as HTMLInputElement).files)" />
       </p>
     </div>
@@ -88,22 +88,25 @@ function next() {
     <div v-else class="stack">
       <DownloadPanel @view-yaml="showYaml = true" />
       <ImportGuide />
-      <details class="checks">
+      <details class="xxd-collapse checks">
         <summary>{{ t('buildPage.checksTitle') }}</summary>
         <BuildReport hide-verdict />
       </details>
     </div>
 
-    <div class="dock">
-      <div class="dock-meta">
-        <span v-if="!canNext" class="need-file">{{ t('wizard.needFile') }}</span>
+    <div class="xxd-dock dock">
+      <div class="xxd-dock__status" role="status" :data-tone="canNext ? undefined : 'warning'">
+        <template v-if="!canNext">{{ t('wizard.needFile') }}</template>
         <template v-else>{{ t('count.sourcesShort', { n: store.sources.length }) }} · {{ t('count.nodesShort', { n: store.nodeCount }) }}</template>
       </div>
-      <span class="spacer"></span>
-      <button v-if="step === 1" type="button" class="btn btn-quiet" @click="emit('finish')">{{ t('wizard.skip') }}</button>
-      <button v-if="step > 1" type="button" class="btn btn-quiet" @click="step--"><Icon name="ArrowLeft" class="dir-icon" />{{ t('common.prev') }}</button>
-      <button v-if="step < 5" type="button" class="btn btn-primary" :disabled="!canNext" @click="next">{{ t('common.next') }}<Icon name="ArrowRight" class="dir-icon" /></button>
-      <button v-else type="button" class="btn btn-primary" @click="emit('finish')">{{ t('wizard.enter') }}<Icon name="ArrowRight" class="dir-icon" /></button>
+      <div class="xxd-dock__tools">
+        <button v-if="step === 1" type="button" class="xxd-btn" data-variant="ghost" @click="emit('finish')"><span>{{ t('wizard.skip') }}</span></button>
+        <button v-if="step > 1" type="button" class="xxd-btn" data-variant="ghost" @click="step--"><Icon name="ArrowLeft" :size="16" class="dir-icon" /><span>{{ t('common.prev') }}</span></button>
+      </div>
+      <div class="xxd-dock__primary">
+        <button v-if="step < 5" type="button" class="xxd-btn" data-variant="primary" :disabled="!canNext" @click="next"><span>{{ t('common.next') }}</span><Icon name="ArrowRight" :size="16" class="dir-icon" /></button>
+        <button v-else type="button" class="xxd-btn" data-variant="primary" @click="emit('finish')"><span>{{ t('wizard.enter') }}</span><Icon name="ArrowRight" :size="16" class="dir-icon" /></button>
+      </div>
     </div>
 
     <NodeListDialog v-if="viewing" :source="viewing" @close="viewing = null" />
@@ -113,24 +116,21 @@ function next() {
 
 <style scoped>
 .wizard { max-width: 1000px; padding-bottom: 140px; }
-.steps { display: grid; grid-template-columns: repeat(5, 1fr); margin: 0 0 32px; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+/* Progress: five steps on one baseline; the current step carries the ink line (like a tab). */
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0 0 var(--space-8); padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .steps li { position: relative; }
-.steps li.now::before, .steps li.done::before { content: ""; position: absolute; top: -1px; left: 0; right: 0; height: 2px; background: var(--ink); }
-.steps li.done::before { opacity: 0.35; }
-.steps button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 0 0; padding-inline-end: 8px; border: 0; background: transparent; color: var(--muted); text-align: start; }
+.steps li.now::before, .steps li.done::before { content: ""; position: absolute; top: -1px; inset-inline: 0; height: 2px; background: var(--action); }
+.steps li.done::before { background: var(--line-strong); }
+.steps button { display: flex; align-items: center; gap: var(--space-2); width: 100%; padding: var(--space-3) var(--space-2) 0 0; border: 0; background: transparent; color: var(--muted); font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body); text-align: start; cursor: pointer; }
+.steps button:disabled { color: var(--disabled-ink); cursor: not-allowed; }
 .steps .now button, .steps .done button { color: var(--ink); }
-.dot { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border: 1.5px solid currentColor; font-size: 12px; font-weight: 700; }
-.now .dot { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.dot svg { width: 13px; height: 13px; }
-.step-title { font-size: var(--navigation-font-size); font-weight: var(--navigation-font-weight); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wiz-head { margin-bottom: 24px; }
-.imported { gap: 6px; }
-.alt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
-.link { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: 0; background: none; color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-.link svg { width: 14px; height: 14px; }
-.keep-default { display: inline-flex; align-items: center; gap: 6px; margin: 12px 0 0; padding: 4px 10px; background: var(--notice-success-bg); color: var(--notice-success-ink); font-size: 13px; font-weight: 700; }
-.keep-default svg { width: 15px; height: 15px; }
-.need-file { color: var(--notice-warning-ink); font-weight: 700; }
-.checks summary { cursor: pointer; font-weight: 700; margin-bottom: 10px; }
-@media (max-width: 700px) { .step-title { display: none; } .steps button { justify-content: center; padding-inline-end: 0; } }
+.dot { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: var(--r-xs); font: var(--weight-medium) var(--text-xs) / 1 var(--font-body); }
+.now .dot { border-color: var(--action-fill); background: var(--action-fill); color: var(--on-action); }
+.step-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wiz-head { margin-bottom: var(--space-6); }
+.imported { gap: var(--space-1-5); }
+.alt { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1-5); margin: 0; color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+.link { display: inline-flex; align-items: center; gap: var(--space-1); }
+.keep-default { display: inline-flex; align-items: center; gap: var(--space-1-5); margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+@media (max-width: 640px) { .step-title { display: none; } .steps button { justify-content: center; padding-inline-end: 0; } }
 </style>

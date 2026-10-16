@@ -14,8 +14,8 @@ const errors = computed(() => store.build.issues.filter((i) => i.level === 'ERRO
 <template>
   <section class="download" :class="{ bad: !store.build.ok }">
     <div class="status">
-      <Icon name="CircleCheck" v-if="store.build.ok" class="ok-icon" aria-hidden="true" />
-      <Icon name="TriangleAlert" v-else class="bad-icon" aria-hidden="true" />
+      <Icon v-if="store.build.ok" name="CircleCheck" :size="24" class="ok-icon" />
+      <Icon v-else name="TriangleAlert" :size="24" class="bad-icon" />
       <div>
         <p class="verdict">{{ store.build.ok ? t('report.ok') : t('report.bad') }}</p>
         <p class="meta">
@@ -26,9 +26,9 @@ const errors = computed(() => store.build.issues.filter((i) => i.level === 'ERRO
       </div>
     </div>
     <div class="actions">
-      <button type="button" class="btn btn-quiet" @click="emit('view-yaml')"><Icon name="Code"  />{{ t('buildPage.viewYaml') }}</button>
-      <button type="button" class="btn btn-primary btn-lg" :disabled="!store.build.ok" @click="store.downloadConfig()">
-        <Icon name="Download"  />{{ t('buildPage.download') }}
+      <button type="button" class="xxd-btn" data-variant="ghost" @click="emit('view-yaml')"><Icon name="Code" :size="16" /><span>{{ t('buildPage.viewYaml') }}</span></button>
+      <button type="button" class="xxd-btn" data-variant="primary" data-size="lg" :disabled="!store.build.ok" @click="store.downloadConfig()">
+        <Icon name="Download" :size="16" /><span>{{ t('buildPage.download') }}</span>
       </button>
     </div>
   </section>
@@ -40,18 +40,19 @@ const errors = computed(() => store.build.issues.filter((i) => i.level === 'ERRO
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid var(--ink);
-  background: var(--panel);
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
 }
-.download.bad { border-color: var(--notice-error-border); background: var(--notice-error-bg); }
-.status { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.status svg { flex: none; width: 34px; height: 34px; stroke-width: 1.6; }
-.ok-icon { color: var(--notice-success-ink); }
-.bad-icon { color: var(--notice-error-ink); }
-.verdict { margin: 0; font-family: var(--font-title); font-size: 22px; font-weight: 900; }
-.bad .verdict { color: var(--notice-error-ink); }
-.meta { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.download.bad { border-color: color-mix(in srgb, var(--danger) 32%, var(--line)); background: color-mix(in srgb, var(--danger) 6%, var(--paper)); }
+.status { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.status :deep(.ui-icon) { flex: none; }
+.ok-icon { color: var(--success); }
+.bad-icon { color: var(--danger); }
+.verdict { margin: 0; font: var(--weight-strong) var(--text-xl) / var(--leading-lg) var(--font-title); }
+.bad .verdict { color: var(--danger); }
+.meta { margin: var(--space-0-5) 0 0; color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 </style>

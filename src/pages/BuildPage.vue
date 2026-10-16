@@ -14,7 +14,6 @@ const showYaml = ref(false)
   <div class="page">
     <header class="page-head">
       <div>
-        <p class="eyebrow">{{ t('buildPage.eyebrow') }}</p>
         <h1 class="page-title">{{ t('nav.build') }}</h1>
         <p class="page-lede">{{ t('buildPage.lede') }}</p>
       </div>
@@ -39,5 +38,5 @@ const showYaml = ref(false)
 </template>
 
 <style scoped>
-.section.checks { margin-top: 36px; }
+.section.checks { margin-top: var(--space-8); }
 </style>
