@@ -5,6 +5,7 @@ import { classifyRegion } from '@/core/regions'
 import { loadSourceFromText, renameSource } from '@/core/parser/loadSource'
 import { exportProject, importProject } from '@/core/project/projectFile'
 import { DEFAULT_REGIONS } from '@/catalog/regions'
+import { EXTRA_PURPOSE_TEMPLATES, purposeFromTemplate } from '@/catalog/purposes'
 import type { ProxyGroup } from '@/types'
 import { exampleSources, proxiesYaml, settings, ss } from '../helpers'
 
@@ -61,38 +62,75 @@ describe('builder — mandatory tests (spec §41)', () => {
     const r = buildConfig([s], settings())
     expect(r.nodes[0].regionId).toBe('other')
     expect(r.issues).toContainEqual(expect.objectContaining({ level: 'WARNING', code: 'region-unknown' }))
-    expect(groupNames(r.config)).toContain('🏳️ 其他手动')
+    expect(groupNames(r.config)).toContain('🏳️ 其他自动')
   })
 
   // §41.6
-  it('does not generate a US group without US nodes and drops it from business candidates', async () => {
+  it('does not generate a US group without US nodes and skips it in purposes', async () => {
     const s = await loadSourceFromText(proxiesYaml([ss('日本01', 'jp.example')]), '奶昔.yaml')
     const r = buildConfig([s], settings())
     expect(groupNames(r.config).some((n) => n.includes('美国'))).toBe(false)
     const chatgpt = group(r.config, '🤖 ChatGPT')!
     expect(chatgpt.proxies.some((p) => p.includes('美国'))).toBe(false)
     expect(chatgpt.proxies[0]).toBe('🇯🇵 日本自动')
+    expect(r.issues).toContainEqual(expect.objectContaining({ level: 'INFO', code: 'purpose-line-missing' }))
     expect(r.ok).toBe(true)
   })
 
   // §41.7
-  it('lets ChatGPT pick a region group, a source group and 全部手动 at the same time', async () => {
+  it('lets a purpose go through a region, a file, one node and DIRECT, in that order', async () => {
     const sources = await exampleSources()
     const naixi = sources.find((s) => s.name === '奶昔')!
+    const jp = naixi.nodes.find((n) => n.originalName === '日本01')!
     const r = buildConfig(
       sources,
       settings((s) => {
-        s.business.chatgpt = {
-          defaultRef: 'region:us:auto',
-          candidates: ['region:us:auto', `source:${naixi.id}`, 'global:manual'],
-        }
+        s.purposes.find((p) => p.id === 'chatgpt')!.lines = ['region:us', `source:${naixi.id}`, `node:${jp.fingerprint}`, 'DIRECT']
       }),
     )
     const chatgpt = group(r.config, '🤖 ChatGPT')!
-    expect(chatgpt.type).toBe('select')
-    expect(chatgpt.proxies).toEqual(['🇺🇸 美国自动', '📦 奶昔', '🌍 全部手动'])
-    expect(group(r.config, '🇺🇸 美国自动')!.proxies).toEqual(['[奶昔] 美国01', '[机场A] 美国LA'])
-    expect(group(r.config, '📦 奶昔')!.proxies).toEqual(['[奶昔] 美国01', '[奶昔] 日本01'])
+    expect(chatgpt.type).toBe('fallback')
+    expect(chatgpt.proxies).toEqual(['🇺🇸 美国自动', '📦 奶昔 自动', '[奶昔] 日本01', 'DIRECT'])
+    // A region merges the nodes of every file and uses the fastest.
+    expect(group(r.config, '🇺🇸 美国自动')).toMatchObject({ type: 'url-test', proxies: ['[奶昔] 美国01', '[机场A] 美国LA'] })
+    expect(group(r.config, '📦 奶昔 自动')!.proxies).toEqual(['[奶昔] 美国01', '[奶昔] 日本01'])
+    expect(r.ok).toBe(true)
+
+    const manual = buildConfig(sources, settings((s) => (s.purposes.find((p) => p.id === 'chatgpt')!.mode = 'select')))
+    expect(group(manual.config, '🤖 ChatGPT')!.type).toBe('select')
+  })
+
+  it('falls back to every node when none of a purpose’s lines exist', async () => {
+    const s = await loadSourceFromText(proxiesYaml([ss('日本01', 'jp.example')]), '奶昔.yaml')
+    const r = buildConfig([s], settings((x) => (x.purposes.find((p) => p.id === 'chatgpt')!.lines = ['region:us'])))
+    expect(group(r.config, '🤖 ChatGPT')!.proxies).toEqual(['⚡ 全部自动'])
+    expect(r.issues).toContainEqual(expect.objectContaining({ level: 'WARNING', code: 'purpose-no-lines' }))
+    expect(r.ok).toBe(true)
+  })
+
+  it('makes a DIRECT-only purpose a plain choice, not a tested group', async () => {
+    const r = buildConfig(await exampleSources(), settings((x) => (x.purposes.find((p) => p.id === 'apple')!.lines = ['DIRECT'])))
+    expect(group(r.config, '🍎 苹果')).toEqual({ name: '🍎 苹果', type: 'select', proxies: ['DIRECT'] })
+  })
+
+  it('puts custom sites before every rule set and reports bad entries', async () => {
+    const r = buildConfig(
+      await exampleSources(),
+      settings((x) => {
+        const p = x.purposes.find((p) => p.id === 'chatgpt')!
+        p.name = '🎨 ChatGPT 作图'
+        p.domains = ['https://chatgpt.com/', 'oaiusercontent.com', 'openai', '*.oaistatic.com', 'not a domain!']
+      }),
+    )
+    const rules = r.config.rules as string[]
+    expect(rules.slice(0, 4)).toEqual([
+      'DOMAIN-SUFFIX,chatgpt.com,🎨 ChatGPT 作图',
+      'DOMAIN-SUFFIX,oaiusercontent.com,🎨 ChatGPT 作图',
+      'DOMAIN-KEYWORD,openai,🎨 ChatGPT 作图',
+      'DOMAIN-SUFFIX,oaistatic.com,🎨 ChatGPT 作图',
+    ])
+    expect(rules).toContain('RULE-SET,openai,🎨 ChatGPT 作图')
+    expect(r.issues).toContainEqual(expect.objectContaining({ level: 'WARNING', code: 'purpose-domain' }))
     expect(r.ok).toBe(true)
   })
 
@@ -107,7 +145,7 @@ describe('builder — mandatory tests (spec §41)', () => {
     expect(rules.findIndex((x) => x.startsWith('RULE-SET,github,'))).toBeLessThan(
       rules.findIndex((x) => x.startsWith('RULE-SET,geolocation-not-cn,')),
     )
-    expect(rules.at(-1)).toBe('MATCH,🌐 国外')
+    expect(rules.at(-1)).toBe('MATCH,🌐 其它国外')
   })
 
   // §41.10
@@ -115,9 +153,8 @@ describe('builder — mandatory tests (spec §41)', () => {
     const sources = await exampleSources()
     const naixi = sources[0]
     const s = settings((x) => {
-      x.business.chatgpt = { defaultRef: `source:${naixi.id}`, candidates: [`source:${naixi.id}`, 'global:auto'] }
+      x.purposes.find((p) => p.id === 'chatgpt')!.lines = [`source:${naixi.id}`, 'all']
       x.strategy.composites.push({ id: 'c1', sourceId: naixi.id, regionId: 'us', mode: 'url-test' })
-      x.rules.modules = ['ai', 'streaming']
     })
     const before = JSON.stringify(s)
     const replacement = await loadSourceFromText(
@@ -128,7 +165,7 @@ describe('builder — mandatory tests (spec §41)', () => {
     const next = [replacement, ...sources.slice(1)]
     const r = buildConfig(next, s)
     expect(JSON.stringify(s)).toBe(before)
-    expect(group(r.config, '🤖 ChatGPT')!.proxies).toEqual(['📦 奶昔', '⚡ 全部自动'])
+    expect(group(r.config, '🤖 ChatGPT')!.proxies).toEqual(['📦 奶昔 自动', '⚡ 全部自动'])
     expect(group(r.config, '🇺🇸 奶昔 / 美国')!.proxies).toEqual(['[奶昔] 美国 02'])
     expect(r.ok).toBe(true)
   })
@@ -139,10 +176,12 @@ describe('builder — behaviour', () => {
     const r = buildConfig(await exampleSources(), settings())
     expect(proxyNames(r.config)).toEqual(['[奶昔] 美国01', '[奶昔] 日本01', '[机场A] 美国LA', '[机场A] 新加坡01', '[机场B] 日本东京'])
     const names = groupNames(r.config)
-    for (const n of ['🌍 全部手动', '⚡ 全部自动', '🇺🇸 美国手动', '🇺🇸 美国自动', '🇯🇵 日本手动', '🇯🇵 日本自动', '🇸🇬 新加坡手动', '🇸🇬 新加坡自动', '📦 奶昔', '📦 机场A', '📦 机场B', '🤖 ChatGPT', '✳️ Claude', '✨ Gemini', '🐙 GitHub', '🇨🇳 国内', '🌐 国外'])
-      expect(names).toContain(n)
-    expect(names.some((n) => n.includes('香港'))).toBe(false)
-    expect(names).not.toContain('📦 奶昔 自动')
+    // Purposes first (what people pick in OpenClash), then the lines they use.
+    expect(names).toEqual([
+      '🤖 ChatGPT', '🧠 AI 工具', '🔍 谷歌', '✈️ 电报', '🎬 影音', '🎞 奈飞', '🍎 苹果', '🪟 微软', '🌐 其它国外',
+      '⚡ 全部自动', '🇺🇸 美国自动', '🇯🇵 日本自动', '🇸🇬 新加坡自动', '📦 奶昔 自动', '📦 机场A 自动', '📦 机场B 自动',
+    ])
+    expect(group(r.config, '🇯🇵 日本自动')!.proxies).toEqual(['[奶昔] 日本01', '[机场B] 日本东京'])
     expect(r.ok).toBe(true)
   })
 
@@ -165,12 +204,12 @@ describe('builder — behaviour', () => {
     const [naixi, ...rest] = await exampleSources()
     const r = buildConfig([renameSource(naixi, '奶昔Pro'), ...rest], settings())
     expect(proxyNames(r.config)[0]).toBe('[奶昔Pro] 美国01')
-    expect(groupNames(r.config)).toContain('📦 奶昔Pro')
+    expect(groupNames(r.config)).toContain('📦 奶昔Pro 自动')
   })
 
   it('serializes readable UTF-8 YAML without anchors or tags', async () => {
     const r = buildConfig(await exampleSources(), settings())
-    expect(r.yaml).toContain('🌐 国外')
+    expect(r.yaml).toContain('🌐 其它国外')
     expect(r.yaml).not.toMatch(/&a\d|\*a\d|!!js|!!python/)
     expect(r.yaml).not.toContain('\\U')
     const keys = Object.keys(parse(r.yaml))
@@ -189,7 +228,7 @@ describe('builder — behaviour', () => {
       'tricky.yaml',
     )
     for (const tpl of ['openclash-standard', 'mihomo-generic'] as const) {
-      const r = buildConfig([...(await exampleSources()), tricky], settings((s) => ((s.base.templateId = tpl), (s.rules.preset = 'full'))))
+      const r = buildConfig([...(await exampleSources()), tricky], settings((s) => (s.base.templateId = tpl)))
       const v11 = parse(r.yaml, { version: '1.1' })
       const v12 = parse(r.yaml, { version: '1.2' })
       expect(v11).toEqual(v12)
@@ -200,18 +239,19 @@ describe('builder — behaviour', () => {
     expect(withColon).toContain('password: ":secret"')
   })
 
-  it('only adds rule providers for enabled services', async () => {
-    const lite = buildConfig(await exampleSources(), settings((s) => ((s.rules.preset = 'lite'), (s.rules.modules = []))))
+  it('only adds rule providers for the services purposes cover', async () => {
+    const lite = buildConfig(await exampleSources(), settings((s) => (s.purposes = s.purposes.filter((p) => p.id === 'foreign'))))
     expect(Object.keys(lite.config['rule-providers'] as object).sort()).toEqual(['cn', 'cn_ip', 'geolocation-not-cn', 'private', 'private_ip'])
-    const full = buildConfig(await exampleSources(), settings((s) => (s.rules.preset = 'full')))
-    expect(full.stats.businessStrategies).toBeGreaterThan(20)
-    expect(full.ok).toBe(true)
+    const all = buildConfig(await exampleSources(), settings((s) => s.purposes.push(...EXTRA_PURPOSE_TEMPLATES.map((t) => purposeFromTemplate(t, 'zh-CN')))))
+    expect(all.stats.businessStrategies).toBe(14)
+    expect(all.config.rules as string[]).toContain('RULE-SET,category-ads-all,🛑 广告拦截')
+    expect(all.ok).toBe(true)
   })
 
   it('downloads rule sets through the overseas group unless DIRECT is chosen', async () => {
     const proxies = (r: ReturnType<typeof buildConfig>) =>
       new Set(Object.values(r.config['rule-providers'] as Record<string, { proxy: string }>).map((p) => p.proxy))
-    expect(proxies(buildConfig(await exampleSources(), settings()))).toEqual(new Set(['🌐 国外']))
+    expect(proxies(buildConfig(await exampleSources(), settings()))).toEqual(new Set(['🌐 其它国外']))
     const direct = buildConfig(await exampleSources(), settings((s) => (s.rules.downloadDirect = true)))
     expect(proxies(direct)).toEqual(new Set(['DIRECT']))
     expect(direct.ok).toBe(true)

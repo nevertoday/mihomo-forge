@@ -1,3 +1,4 @@
+import { createDefaultPurposes } from '@/catalog/purposes'
 import { DEFAULT_ENABLED_REGION_IDS, DEFAULT_REGIONS } from '@/catalog/regions'
 import type { Locale, ProjectSettings, RegionDefinition } from '@/types'
 
@@ -49,6 +50,7 @@ export function createDefaultSettings(locale: Locale = 'zh-CN'): ProjectSettings
       downloadDirect: false,
     },
     business: {},
+    purposes: createDefaultPurposes(locale),
     base: {
       templateId: 'openclash-standard',
       customYaml: '',
@@ -78,6 +80,7 @@ export function normalizeSettings(input: Partial<ProjectSettings> | undefined): 
     },
     rules: { ...d.rules, ...input.rules },
     business: { ...(input.business ?? {}) },
+    purposes: input.purposes?.length ? input.purposes.map((p) => ({ ...p, services: [...p.services], domains: [...p.domains], lines: [...p.lines] })) : createDefaultPurposes(input.outputLocale ?? d.outputLocale),
     base: { ...d.base, ...input.base },
   }
 }

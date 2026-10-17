@@ -1,18 +1,10 @@
 import { parse } from 'yaml'
-import { resolveServices } from '@/catalog/presets'
-import { FOREIGN_SERVICE_ID } from '@/catalog/services'
+import { ALL_SERVICES, FOREIGN_SERVICE_ID } from '@/catalog/services'
 import { assignDisplayNames, deduplicateNodes, toOutputProxy } from '@/core/nodes'
 import { classifyNodes, invalidPatterns } from '@/core/regions'
 import { generateRuleProviders, generateRules } from '@/core/rules'
-import {
-  generateBusinessGroups,
-  generateCompositeGroups,
-  generateFilterGroups,
-  generateGlobalGroups,
-  generateRegionGroups,
-  generateSourceGroups,
-  type StrategyContext,
-} from '@/core/strategies'
+import { buildLines, generatePurposeGroups, purposeDomainRules, purposeTargets } from '@/core/purposes'
+import { generateCompositeGroups, generateFilterGroups, type StrategyContext } from '@/core/strategies'
 import { hasErrors, validateFinalConfig } from '@/core/validator'
 import { BASE_TEMPLATES } from '@/templates/base'
 import type { BuildIssue, BuildResult, ProjectSettings, ProxyNode, Source } from '@/types'
@@ -98,32 +90,25 @@ export function buildConfig(sources: Source[], settings: ProjectSettings): Build
   for (const s of sources)
     if (!s.nodes.length) issues.push({ level: 'WARNING', code: 'empty-source', params: { name: s.name } })
 
-  // 9–12. node strategies
+  // 9–12. lines: everything, each region (merged across files), each file, advanced groups, single nodes
   const locale = settings.outputLocale ?? 'zh-CN'
   const ctx: StrategyContext = { nodes, sources, regions: settings.regions, settings: settings.strategy, locale }
-  const strategies = [
-    ...generateGlobalGroups(ctx),
-    ...generateRegionGroups(ctx),
-    ...generateSourceGroups(ctx),
-    ...generateCompositeGroups(ctx, issues),
-    ...generateFilterGroups(ctx, issues),
-  ]
+  const strategies = [...generateCompositeGroups(ctx, issues), ...generateFilterGroups(ctx, issues)]
+  const lineSet = buildLines({ nodes, sources, regions: settings.regions, settings: settings.strategy, locale, extra: strategies })
 
-  // 13. business strategies
-  const services = resolveServices(settings.rules)
-  const business = generateBusinessGroups(services, settings.business, strategies, issues, locale)
+  // 13. one group per purpose
+  const purposes = generatePurposeGroups(settings.purposes, lineSet, settings.strategy, issues, locale)
 
-  // 14–15. rule providers and rules
-  const targets: Record<string, string> = {}
-  for (const s of services) if (s.fixedTarget) targets[s.id] = s.fixedTarget
-  for (const b of business) targets[b.service.id] = b.group.name
+  // 14–15. rule providers and rules: LAN and mainland China direct, each purpose's services to its group
+  const targets: Record<string, string> = { lan: 'DIRECT', china: 'DIRECT', ...purposeTargets(purposes) }
+  const services = ALL_SERVICES.filter((s) => targets[s.id])
   const matchTarget = targets[FOREIGN_SERVICE_ID] ?? 'DIRECT'
   const ruleProviders = generateRuleProviders(
     services,
     settings.rules.mirror,
     settings.rules.downloadDirect ? 'DIRECT' : matchTarget,
   )
-  const generatedRules = generateRules(services, targets, matchTarget)
+  const generatedRules = [...purposeDomainRules(purposes, issues), ...generateRules(services, targets, matchTarget)]
 
   // 16. base template
   const { base, extraRules, extraProviders } = resolveBaseTemplate(settings, issues)
@@ -131,13 +116,10 @@ export function buildConfig(sources: Source[], settings: ProjectSettings): Build
     if (name in ruleProviders)
       issues.push({ level: 'WARNING', code: 'provider-clash', params: { name } })
 
-  const foreign = business.find((b) => b.service.id === FOREIGN_SERVICE_ID)
-  const orderedBusiness = foreign ? [foreign, ...business.filter((b) => b !== foreign)] : business
-
   const config: Record<string, unknown> = {
     ...base,
     proxies: nodes.map(toOutputProxy),
-    'proxy-groups': [...orderedBusiness.map((b) => b.group), ...strategies.map((s) => s.group)],
+    'proxy-groups': [...purposes.map((p) => p.group), ...lineSet.groups],
     rules: [...extraRules, ...generatedRules],
     'rule-providers': { ...extraProviders, ...ruleProviders },
   }
@@ -154,7 +136,9 @@ export function buildConfig(sources: Source[], settings: ProjectSettings): Build
     yaml,
     nodes,
     strategies,
-    business,
+    business: [],
+    lines: lineSet.lines,
+    purposes,
     issues,
     ok,
     stats: {
@@ -163,11 +147,11 @@ export function buildConfig(sources: Source[], settings: ProjectSettings): Build
       duplicates: removed.length,
       rejected,
       unknownRegion: unknown,
-      regionStrategies: strategies.filter((s) => s.kind === 'region').length,
-      sourceStrategies: strategies.filter((s) => s.kind === 'source').length,
+      regionStrategies: lineSet.lines.filter((l) => l.kind === 'region').length,
+      sourceStrategies: lineSet.lines.filter((l) => l.kind === 'source').length,
       compositeStrategies: strategies.filter((s) => s.kind === 'composite').length,
       filterStrategies: strategies.filter((s) => s.kind === 'filter').length,
-      businessStrategies: business.length,
+      businessStrategies: purposes.length,
       ruleProviders: Object.keys(config['rule-providers'] as object).length,
       rules: (config.rules as string[]).length,
     },

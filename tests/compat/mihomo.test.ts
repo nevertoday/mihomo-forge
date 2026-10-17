@@ -12,7 +12,8 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { parse } from 'yaml'
 import { buildConfig } from '@/core/builder'
-import type { BasePreset, Locale, ProjectSettings } from '@/types'
+import { EXTRA_PURPOSE_TEMPLATES, purposeFromTemplate } from '@/catalog/purposes'
+import type { Locale, ProjectSettings } from '@/types'
 import { exampleSources, settings } from '../helpers'
 
 const MIHOMO = process.env.MIHOMO_BIN
@@ -26,30 +27,32 @@ puts JSON.generate(data)
 `
 
 const LOCALES: Locale[] = ['zh-CN', 'zh-TW', 'en', 'ja', 'ar']
-const PRESETS: BasePreset[] = ['lite', 'standard', 'full']
+/** default purposes · every optional purpose · advanced lines and custom sites */
+const VARIANTS = ['default', 'all', 'advanced'] as const
 const TEMPLATES: ProjectSettings['base']['templateId'][] = ['openclash-standard', 'mihomo-generic']
 
 describe.skipIf(!MIHOMO)('Mihomo core accepts every generated config', () => {
   for (const locale of LOCALES)
-    for (const preset of PRESETS)
+    for (const variant of VARIANTS)
       for (const tpl of TEMPLATES)
-        it(`${locale} · ${preset} · ${tpl}`, async () => {
+        it(`${locale} · ${variant} · ${tpl}`, async () => {
           const sources = await exampleSources()
           const r = buildConfig(
             sources,
             settings((s) => {
               s.outputLocale = locale
-              s.rules.preset = preset
               s.base.templateId = tpl
-              if (preset === 'full') {
-                s.rules.modules = ['ai', 'developer', 'streaming', 'social', 'gaming', 'crypto', 'ads']
-                s.strategy.sourceAuto[sources[0].id] = true
+              if (variant !== 'default') s.purposes.push(...EXTRA_PURPOSE_TEMPLATES.map((t) => purposeFromTemplate(t, locale)))
+              if (variant === 'advanced') {
                 s.strategy.composites.push({ id: 'c1', sourceId: sources[0].id, regionId: 'us', mode: 'url-test' })
                 s.strategy.filters.push({
                   id: 'f1', name: '🔎 美国 日本', include: ['美国', '日本'], exclude: ['东京'], regex: false,
                   sourceIds: [], regionId: null, mode: 'fallback',
                 })
-                s.business.chatgpt = { defaultRef: 'filter:f1', candidates: ['filter:f1', 'composite:c1', 'global:auto'] }
+                const chatgpt = s.purposes.find((p) => p.id === 'chatgpt')!
+                chatgpt.lines = ['filter:f1', 'composite:c1', `node:${sources[1].nodes[0].fingerprint}`, `source:${sources[2].id}`, 'all', 'DIRECT']
+                chatgpt.domains = ['chatgpt.com', 'oaiusercontent.com', 'openai']
+                s.purposes.push({ id: 'custom1', name: '🎨 作图', services: [], domains: ['midjourney.com'], lines: ['region:jp', 'all'], mode: 'select' })
               }
             }),
           )

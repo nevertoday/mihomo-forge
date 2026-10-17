@@ -10,6 +10,7 @@ import zhCN from '@/i18n/messages/zh-CN'
 import zhTW from '@/i18n/messages/zh-TW'
 import { DEFAULT_REGIONS } from '@/catalog/regions'
 import { SERVICE_BY_ID } from '@/catalog/services'
+import { PURPOSE_TEMPLATES, purposeFromTemplate, purposeName } from '@/catalog/purposes'
 import type { IssueCode, Locale, ProxyGroup } from '@/types'
 import { exampleSources, settings } from '../helpers'
 
@@ -77,6 +78,8 @@ describe('i18n catalogs', () => {
   })
 })
 
+const foreign = purposeFromTemplate(PURPOSE_TEMPLATES.find((t) => t.id === 'foreign')!, 'zh-CN')
+
 describe('localized group names in config.yaml', () => {
   it('names every region and non-brand service in every output language', () => {
     for (const n of Object.values(NAMING)) {
@@ -88,22 +91,27 @@ describe('localized group names in config.yaml', () => {
 
   for (const out of ['en', 'ja', 'zh-TW', 'ar'] as Locale[]) {
     it(`builds a valid config with ${out} group names`, async () => {
-      const r = buildConfig(await exampleSources(), settings((s) => ((s.outputLocale = out), (s.rules.preset = 'full'))))
+      const r = buildConfig(await exampleSources(), settings((s) => (s.outputLocale = out)))
       expect(r.ok).toBe(true)
       const names = (r.config['proxy-groups'] as ProxyGroup[]).map((g) => g.name)
       expect(names).toContain(NAMING[out].globalAuto)
       expect(names).toContain(`🇺🇸 ${NAMING[out].regionAuto.replace('{icon} ', '').replace('{region}', NAMING[out].regions.us)}`)
-      expect((r.config.rules as string[]).at(-1)).toBe(`MATCH,🌐 ${NAMING[out].services.foreign}`)
+      expect((r.config.rules as string[]).at(-1)).toBe(`MATCH,${purposeName(foreign, out)}`)
       // Node names are never translated.
       expect((r.config.proxies as { name: string }[])[0].name).toBe('[奶昔] 美国01')
     })
   }
 
-  it('produces English names like 🇺🇸 United States Auto', async () => {
+  it('produces English names like 🇺🇸 United States Auto and keeps renamed purposes', async () => {
     const r = buildConfig(await exampleSources(), settings((s) => (s.outputLocale = 'en')))
-    const chat = (r.config['proxy-groups'] as ProxyGroup[]).find((g) => g.name === '🤖 ChatGPT')!
-    expect(chat.proxies.slice(0, 2)).toEqual(['🇺🇸 United States Auto', '🇺🇸 United States Manual'])
-    expect(chat.proxies).toContain('📦 奶昔')
-    expect(chat.proxies).toContain('🌍 All Manual')
+    const groups = r.config['proxy-groups'] as ProxyGroup[]
+    const chat = groups.find((g) => g.name === '🤖 ChatGPT')!
+    expect(chat.proxies.slice(0, 2)).toEqual(['🇺🇸 United States Auto', '🇯🇵 Japan Auto'])
+    expect(groups.map((g) => g.name)).toContain('🧠 AI Tools')
+    const renamed = buildConfig(
+      await exampleSources(),
+      settings((s) => ((s.outputLocale = 'en'), (s.purposes.find((p) => p.id === 'ai')!.name = '🧠 我的 AI'))),
+    )
+    expect((renamed.config['proxy-groups'] as ProxyGroup[]).map((g) => g.name)).toContain('🧠 我的 AI')
   })
 })

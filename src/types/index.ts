@@ -195,6 +195,36 @@ export interface BaseTemplateSettings {
   mergeCustomRules: boolean
 }
 
+/**
+ * A line a purpose can use, in order of preference:
+ *   all                      every node, fastest first (url-test)
+ *   region:<regionId>        every node of one region across all files, fastest first
+ *   source:<sourceId>        every node of one file, fastest first
+ *   node:<fingerprint>       one node (stable across renames and re-imports)
+ *   filter:<id> | composite:<id>   advanced groups
+ *   DIRECT | REJECT
+ */
+export type LineRef = string
+
+/** How a purpose picks among its lines. */
+export type PurposeMode = 'fallback' | 'select' | 'url-test'
+
+/**
+ * A use the traffic is for (ChatGPT, AI tools, streaming…): which sites belong to it and
+ * which lines it goes through, in order. Each purpose becomes one proxy group.
+ */
+export interface Purpose {
+  id: string
+  /** Group name written into config.yaml; the user can rename it. */
+  name: string
+  /** Catalog services whose rule sets route here. */
+  services: string[]
+  /** Extra sites, one per entry: a domain (suffix match) or a keyword without a dot. */
+  domains: string[]
+  lines: LineRef[]
+  mode: PurposeMode
+}
+
 export interface ProjectSettings {
   name: string
   /** Language of generated group names (`🇺🇸 美国自动` vs `🇺🇸 US Auto`). */
@@ -207,6 +237,8 @@ export interface ProjectSettings {
   strategy: StrategySettings
   rules: RulePresetSettings
   business: Record<string, BusinessStrategySetting>
+  /** Purposes, in rule order. The overseas catch-all (services: ['foreign']) is always present. */
+  purposes: Purpose[]
   base: BaseTemplateSettings
 }
 
@@ -249,6 +281,9 @@ export type IssueCode =
   | 'provider-proxy'
   | 'no-match'
   | 'unused-provider'
+  | 'purpose-line-missing'
+  | 'purpose-no-lines'
+  | 'purpose-domain'
 
 /** A build finding. Text is produced by the UI from `code` + `params` in the viewer's language. */
 export interface BuildIssue {
@@ -290,6 +325,27 @@ export interface BusinessGroup {
   candidateRefs: StrategyRef[]
 }
 
+/** A line as built: the group (or node / builtin) a purpose can point at. */
+export interface Line {
+  ref: LineRef
+  kind: 'all' | 'region' | 'source' | 'node' | 'builtin' | 'filter' | 'composite'
+  /** Proxy or group name in config.yaml. */
+  name: string
+  nodeCount: number
+  regionId?: string
+  sourceId?: string
+  /** Source names contributing nodes (regions and “all”), for explanations. */
+  sourceNames?: string[]
+}
+
+export interface PurposeGroup {
+  purpose: Purpose
+  group: ProxyGroup
+  /** Lines actually used, in order; refs that had no nodes are left out. */
+  lines: Line[]
+  missing: LineRef[]
+}
+
 export interface BuildStats {
   sources: number
   nodes: number
@@ -311,6 +367,8 @@ export interface BuildResult {
   nodes: ProxyNode[]
   strategies: StrategyGroup[]
   business: BusinessGroup[]
+  lines: Line[]
+  purposes: PurposeGroup[]
   issues: BuildIssue[]
   stats: BuildStats
   ok: boolean

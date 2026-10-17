@@ -89,11 +89,11 @@ describe('keyword groups', () => {
     expect(r.ok).toBe(true)
   })
 
-  it('can be picked by a site group and is dropped from it when empty', async () => {
+  it('can be picked by a purpose and is skipped when empty', async () => {
     const make = (include: string[]) =>
       settings((s) => {
         s.strategy.filters.push(filter({ include }))
-        s.business.chatgpt = { defaultRef: 'filter:f1', candidates: ['filter:f1', 'region:us:auto'] }
+        s.purposes.find((p) => p.id === 'chatgpt')!.lines = ['filter:f1', 'region:us']
       })
     const ok = buildConfig(await sources(), make(['IEPL']))
     expect((ok.config['proxy-groups'] as ProxyGroup[]).find((g) => g.name === '🤖 ChatGPT')!.proxies).toEqual(['🚀 IEPL', '🇺🇸 美国自动'])
