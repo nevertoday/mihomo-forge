@@ -154,3 +154,17 @@ export function purposeName(purpose: Purpose, locale: Locale): string {
   const untouched = Object.values(t.names).some((n) => purpose.name === `${t.icon} ${n}`)
   return untouched ? `${t.icon} ${t.names[locale]}` : purpose.name
 }
+
+/**
+ * Default lines list preferences (“US, then Japan, then Singapore…”). Once files are imported, a
+ * purpose still on its factory lines keeps only the ones those files have, so the page shows what
+ * will actually be used. Lines the user changed are never touched.
+ */
+export function tidyDefaultLines(purposes: Purpose[], exists: (ref: LineRef) => boolean): void {
+  for (const p of purposes) {
+    const t = ALL_TEMPLATES.find((x) => x.id === p.id)
+    if (!t || p.lines.length !== t.lines.length || p.lines.some((ref, i) => ref !== t.lines[i])) continue
+    const kept = p.lines.filter(exists)
+    if (kept.length && kept.length < p.lines.length) p.lines = kept
+  }
+}

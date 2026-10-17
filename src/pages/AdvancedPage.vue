@@ -8,13 +8,22 @@ import { invalidPatterns } from '@/core/regions'
 import { exampleGroupName, LOCALES, regionName, t } from '@/i18n'
 import { BASE_TEMPLATES } from '@/templates/base'
 import { useProjectStore } from '@/stores/project'
-import type { MirrorId } from '@/types'
+import type { DedupeMode, MirrorId } from '@/types'
+import CompositeEditor from '@/components/CompositeEditor.vue'
+import FilterEditor from '@/components/FilterEditor.vue'
+import ProjectFileCard from '@/components/ProjectFileCard.vue'
 
 const store = useProjectStore()
 const base = computed(() => store.settings.base)
 const strat = computed(() => store.settings.strategy)
 const fileInput = ref<HTMLInputElement>()
 const showRegions = ref(false)
+
+const DEDUPE = computed<{ id: DedupeMode; label: string; hint: string }[]>(() => [
+  { id: 'global', label: t('sourcesPage.dedupeGlobal'), hint: t('sourcesPage.dedupeGlobalHint') },
+  { id: 'source', label: t('sourcesPage.dedupeSource'), hint: t('sourcesPage.dedupeSourceHint') },
+  { id: 'none', label: t('sourcesPage.dedupeNone'), hint: t('sourcesPage.dedupeNoneHint') },
+])
 
 const TEMPLATES = computed(() => [
   { id: 'openclash-standard', label: t('basePage.tplOpenclash'), description: t('basePage.tplOpenclashDesc') },
@@ -62,10 +71,24 @@ function resetRegion(id: string) {
   <div class="page">
     <header class="page-head">
       <div>
-        <h1 class="page-title">{{ t('nav.base') }}</h1>
-        <p class="page-lede">{{ t('basePage.lede') }}</p>
+        <h1 class="page-title">{{ t('home.advanced') }}</h1>
+        <p class="page-lede">{{ t('advanced.lede') }}</p>
       </div>
     </header>
+
+    <section class="section">
+      <div class="section-head"><h2 class="section-title">{{ t('sourcesPage.dedupeTitle') }}</h2></div>
+      <div class="grid dedupe">
+        <label v-for="d in DEDUPE" :key="d.id" class="xxd-choice card-check">
+          <input class="xxd-radio" v-model="store.settings.dedupeMode" type="radio" name="dedupe" :value="d.id" />
+          <span class="check-label"><strong>{{ d.label }}</strong><small>{{ d.hint }}</small></span>
+        </label>
+      </div>
+      <label class="xxd-choice info-check">
+        <input class="xxd-check" v-model="store.settings.excludeInfoNodes" type="checkbox" />
+        <span class="check-label"><strong>{{ t('sourcesPage.excludeInfo') }}</strong><small>{{ t('sourcesPage.excludeInfoHint') }}</small></span>
+      </label>
+    </section>
 
     <section class="section">
       <div class="section-head">
@@ -151,10 +174,22 @@ function resetRegion(id: string) {
         </div>
       </div>
     </section>
+
+    <section class="section">
+      <FilterEditor />
+    </section>
+    <section class="section">
+      <CompositeEditor />
+    </section>
+    <section class="section">
+      <ProjectFileCard />
+    </section>
   </div>
 </template>
 
 <style scoped>
+.dedupe { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-2); }
+.info-check { margin-top: var(--space-3); }
 .templates { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-2); }
 .locales { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--space-2); }
 .card-check small.mono { word-break: break-all; }

@@ -4,40 +4,17 @@ import AppFooter from '@/components/AppFooter.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import NoticeRegion from '@/components/NoticeRegion.vue'
 import ReplaceDialog from '@/components/ReplaceDialog.vue'
-import Wizard from '@/components/Wizard.vue'
 import { t } from '@/i18n'
-import BasePage from '@/pages/BasePage.vue'
-import BuildPage from '@/pages/BuildPage.vue'
-import OverviewPage from '@/pages/OverviewPage.vue'
-import RulesPage from '@/pages/RulesPage.vue'
-import SourcesPage from '@/pages/SourcesPage.vue'
-import StrategiesPage from '@/pages/StrategiesPage.vue'
+import AdvancedPage from '@/pages/AdvancedPage.vue'
+import HomePage from '@/pages/HomePage.vue'
 import { useProjectStore } from '@/stores/project'
-import AppRail from './AppRail.vue'
 import AppTopbar from './AppTopbar.vue'
-import { currentView, go, wizardOpen as wizard } from './nav'
+import { currentView } from './nav'
 
 const store = useProjectStore()
 const dragging = ref(false)
 
-const PAGES = {
-  overview: OverviewPage,
-  sources: SourcesPage,
-  strategies: StrategiesPage,
-  rules: RulesPage,
-  base: BasePage,
-  build: BuildPage,
-}
-
-onMounted(async () => {
-  await store.restore()
-  // First visit: guided 5 steps. Returning users land on the workbench (spec §7–8).
-  wizard.value = !store.hasSavedProject && !store.sources.length
-})
-
-function finishWizard() {
-  go('overview')
-}
+onMounted(() => store.restore())
 
 // Dropping YAML anywhere imports it: updating snapshots is the everyday task.
 let depth = 0
@@ -80,17 +57,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <AppRail />
   <div class="shell">
     <AppTopbar />
     <NoticeRegion />
-    <!-- <main> is the only vertical scroller; the body never scrolls (reference layout rule). -->
+    <!-- <main> is the only vertical scroller; the body never scrolls. -->
     <main id="content">
       <template v-if="store.ready">
-        <Wizard v-if="wizard" @finish="finishWizard" />
-        <component :is="PAGES[currentView]" v-else @wizard="wizard = true" />
+        <AdvancedPage v-if="currentView === 'advanced'" />
+        <HomePage v-else />
       </template>
-      <AppFooter v-if="!wizard" />
+      <AppFooter />
     </main>
   </div>
   <ReplaceDialog />
@@ -103,7 +79,6 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  padding-inline-start: var(--rail-width);
 }
 main {
   flex: 1 1 auto;
@@ -113,9 +88,6 @@ main {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-}
-@media (max-width: 640px) {
-  .shell { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
 }
 /* The kit's drop veil, pinned to the window: dropping YAML anywhere imports it. */
 .drop-veil { position: fixed; pointer-events: none; }

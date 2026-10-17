@@ -8,11 +8,12 @@ UI（Vue 3 + Pinia）
        └─ core/builder       buildConfig(sources, settings) → BuildResult
             ├─ core/nodes        去重、命名
             ├─ core/regions      地区分类
-            ├─ core/strategies   节点策略组 + 业务策略组
+            ├─ core/purposes     线路（全部 / 地区 / 文件 / 节点）+ 用途组
+            ├─ core/strategies   关键词组、来源 × 地区组合
             ├─ core/rules        rule-providers + 规则
             ├─ templates/base    基础模板
             └─ core/validator    最终验证
-catalog/  地区、规则集、服务、预设 —— 纯数据
+catalog/  地区、规则集、服务、默认用途 —— 纯数据
 ```
 
 `core/` 与 `catalog/` 不依赖 DOM 或 Vue，全部可以在 Node 中测试。
@@ -29,8 +30,8 @@ catalog/  地区、规则集、服务、预设 —— 纯数据
 | 6 | deduplicate | `core/nodes` | 每次构建 |
 | 7 | assignDisplayNames | `core/nodes` | 每次构建 |
 | 8 | classifyRegions | `core/regions` | 每次构建 |
-| 9–12 | 全局 / 地区 / 供应商 / 组合策略 | `core/strategies` | 每次构建 |
-| 13 | buildBusinessStrategies | `core/strategies` | 每次构建 |
+| 9–12 | 线路：全部节点、地区（跨文件合并）、文件、关键词组、组合、单个节点 | `core/purposes` · `core/strategies` | 每次构建 |
+| 13 | 用途组（每个用途一个组，线路按顺序） | `core/purposes` | 每次构建 |
 | 14–15 | buildRuleProviders / buildRules | `core/rules` | 每次构建 |
 | 16 | mergeBaseTemplate | `core/builder` | 每次构建 |
 | 17 | validateFinalConfig | `core/validator` | 每次构建 |
@@ -38,31 +39,32 @@ catalog/  地区、规则集、服务、预设 —— 纯数据
 
 1–5 步只在导入时运行一次并缓存；修改任何设置只会重跑 6–18 步（同步、纯函数）。6 个文件约 1000 个节点的完整构建在几十毫秒内完成。
 
-## 策略引用（StrategyRef）
+## 用途与线路（LineRef）
 
-业务策略不直接保存策略组名称，而是保存稳定引用，避免来源改名后失效：
+每个用途（`settings.purposes`）= 名称 + 它负责的网站（目录里的服务 + 自己填的域名）+ 按顺序的线路 + 选择方式（`fallback` 坏了换下一条 / `url-test` 用最快的 / `select` 手动）。
+线路保存稳定引用，避免来源改名后失效：
 
-| 引用 | 生成的组 |
+| 引用 | 生成的组 / 目标 |
 |------|---------|
-| `global:manual` / `global:auto` / `global:fallback` | 🌍 全部手动 / ⚡ 全部自动 / 🛡 故障转移 |
-| `region:us:manual` / `region:us:auto` | 🇺🇸 美国手动 / 🇺🇸 美国自动 |
-| `source:<sourceId>` / `source:<sourceId>:auto` | 📦 来源名 / 📦 来源名 自动 |
-| `composite:<id>` | 🇺🇸 来源 / 美国 |
+| `all` | ⚡ 全部自动（url-test） |
+| `region:us` | 🇺🇸 美国自动：所有文件里的美国节点合在一起（url-test） |
+| `source:<sourceId>` | 📦 来源名 自动（url-test） |
+| `node:<fingerprint>` | 单个节点 |
+| `filter:<id>` / `composite:<id>` | 高级：关键词组 / 来源 × 地区组合 |
 | `DIRECT` / `REJECT` | 内置策略 |
 
-服务目录中的默认候选还可以使用展开符：`regions:auto`、`regions:manual`、`sources:all`。
-
-构建时，引用到未生成的组（例如没有美国节点）会被自动移除；默认策略不可用时回退到第一个可用候选并给出警告。
+构建时，当前文件里没有的线路会被跳过（INFO）；一条都没有时改走全部节点（WARNING）。导入文件后，还停在出厂设置的默认用途只保留文件里实际存在的线路（`tidyDefaultLines`）。
+没改过名字的内置用途跟随 `outputLocale` 输出名称；改过名的保留用户写的名字。
 
 ## 规则顺序
 
 `core/rules` 先按类别排序，再按 `priority` 降序：
 
 ```text
-lan → block → ai → developer → streaming → social → other → china → foreign → MATCH
+自己填的网站 → lan → block → ai → developer → streaming → social → other → china → foreign → MATCH
 ```
 
-因此 Gemini（ai）总在 Google（other）之前，GitHub（developer）总在国外通用之前。同一个规则集只会被引用一次。
+自己填的网站（`DOMAIN-SUFFIX` / 不带点的词用 `DOMAIN-KEYWORD`）排在所有规则集前面。只有被某个用途认领的服务才会生成规则，其余国外流量由 `foreign` 规则集和 MATCH 交给「其它国外」。Gemini（ai）总在 Google（other）之前；同一个规则集只会被引用一次。
 
 ## 持久化
 

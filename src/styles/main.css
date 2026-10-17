@@ -5,16 +5,12 @@
  * Rules: tokens only (no literal colours), weights 400/500/600, no shadows on cards, square by default.
  */
 :root {
-  --rail-width: 56px;
   --gutter: var(--space-8);
-  --content: 1180px;
-}
-/* The sidebar is expanded with labels unless the viewer collapsed it (remembered per browser). */
-@media (min-width: 641px) {
-  :root[data-rail="expanded"] { --rail-width: 216px; }
+  /* One reading column: the page is a short list of steps, not a dashboard. */
+  --content: 1040px;
 }
 @media (max-width: 1024px) { :root { --gutter: var(--space-6); } }
-@media (max-width: 640px) { :root { --rail-width: 0px; --gutter: var(--space-4); } }
+@media (max-width: 640px) { :root { --gutter: var(--space-4); } }
 
 /*
  * The kit's font stacks cover Simplified / Traditional Chinese and English. This app also ships
@@ -110,7 +106,7 @@ code, .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
 .dock {
   position: fixed;
   z-index: var(--z-dock);
-  inset-inline-start: calc(var(--rail-width) + var(--gutter));
+  inset-inline-start: var(--gutter);
   inset-inline-end: var(--gutter);
   bottom: var(--space-4);
   max-width: calc(var(--content) - 2 * var(--gutter));
@@ -127,6 +123,6 @@ code, .mono { font-family: var(--font-mono); font-size: var(--text-xs); }
 
 @media (max-width: 640px) {
   .page { padding-top: var(--space-6); padding-bottom: var(--space-8); }
-  .dock { inset-inline: var(--space-3); bottom: calc(60px + var(--space-3) + env(safe-area-inset-bottom)); flex-wrap: wrap; }
+  .dock { inset-inline: var(--space-3); bottom: calc(var(--space-3) + env(safe-area-inset-bottom)); flex-wrap: wrap; }
   .dock-meta { width: 100%; }
 }

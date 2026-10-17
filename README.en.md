@@ -3,7 +3,7 @@
 [简体中文](README.md) · [繁體中文](README.zh-TW.md) · **English** · [日本語](README.ja.md) · [العربية](README.ar.md)
 
 **A privacy-first, browser-based Mihomo / OpenClash configuration studio.**
-It turns several short-lived subscription YAML snapshots into long-term, manageable node assets and generates one complete, ready-to-import `config.yaml` along three dimensions: region, provider and service rules.
+Drop in the YAML files from your providers, give each purpose (ChatGPT, AI tools, streaming, Telegram…) the lines it should use, in order, and download one `config.yaml` OpenClash can use right away. Nodes of the same region merge into one line across files, fastest first.
 
 🔒 Your node configs are parsed and generated only in this browser. Nothing is uploaded. No backend, no analytics, no account.
 
@@ -20,12 +20,12 @@ The asset that actually lasts is **the YAML snapshot you downloaded while the li
 ```text
 provider-a.yaml  provider-b.yaml  provider-c.yaml  …
         ↓  drop into Mihomo Forge
-sources → regions → node strategies → service strategies → rules
+① import files → ② lines for each purpose → ③ download
         ↓
      config.yaml → OpenClash / Mihomo
 ```
 
-The everyday workflow is one step: download the new YAML, drop it in, confirm the replacement, regenerate. Rules, regions and service strategies are all kept.
+The everyday workflow is one step: download the new YAML, drop it in, confirm the replacement, download again. Purposes and their lines are all kept.
 
 ## Features
 
@@ -34,15 +34,12 @@ The everyday workflow is one step: download the new YAML, drop it in, confirm th
 - **Source prefix**: nodes are named `[source] original name`; repeated names get `#2`, `#3`
 - **Fingerprint deduplication**: SHA-256 over type / server / port / uuid / password / transport options; global, per-source or off
 - **Region detection**: a data-driven regex table (20 regions), editable, with per-node manual overrides
-- **Two parallel ways to pick nodes**
-  - Global: `🌍 All Manual` · `⚡ All Auto` · `🛡 Failover`
-  - By region: `🇺🇸 United States Manual` · `🇺🇸 United States Auto` … (no empty groups)
-  - By provider: `📦 provider-a` · `📦 provider-b` …
-  - Provider × region combinations: on demand only — never a Cartesian product
-  - By node-name keywords: e.g. nodes whose name contains “IEPL”, optionally limited to some sources and a region, with a live preview of the matches
-- **Service strategies**: ChatGPT, Claude, Gemini, GitHub, YouTube, Netflix, Telegram… each is its own `select` group that can **use regions and providers alike**
-- **Modular rule presets**: Lite / Standard / Full / Custom + AI, Developer, Streaming, Social, Gaming, Crypto, Ads modules
-- **Strict rule order**: LAN → ads → AI → developer → streaming → social → other services → mainland China → overseas → MATCH (Gemini always before Google)
+- **Lines by purpose**: ChatGPT, AI tools, Google, Telegram, streaming, Netflix, Apple, Microsoft and other overseas sites by default; each purpose is one group whose lines are used in order (the next takes over when one fails), or switch it to “fastest” or “choose by hand in OpenClash”
+- **Lines**: a region (the same region merged across all files, fastest first), all nodes of one file, a single node, all nodes, direct, block
+- **Custom purposes**: name it (e.g. “🎨 ChatGPT images”), enter sites (`chatgpt.com`, `openai`) or tick common ones; your own sites come before every rule set
+- **Mainland China and LAN always direct**; overseas sites no purpose claims go through “Other Overseas”
+- **Advanced (optional)**: keyword groups from node names (e.g. “IEPL”) and source × region combinations, usable as lines
+- **Strict rule order**: your sites → LAN → ads → AI → developer → streaming → social → other services → mainland China → overseas → MATCH (Gemini always before Google)
 - **Reference validation**: unique group names, every reference exists, every RULE-SET exists, MATCH last; export is blocked on errors
 - **Update diff**: replacing a source shows `+added / -removed / ~renamed`
 - **Base templates**: OpenClash standard / Mihomo generic / your own `base.yaml`
@@ -72,38 +69,44 @@ Pick a language with the switcher in the top bar, or link directly with `?lang=e
 ## Importing into OpenClash
 
 1. OpenClash → Config Manage → upload the generated `config.yaml` and enable it. Use the **Meta (Mihomo) core** — `.mrs` rule sets require it.
-2. The first start downloads about 20–45 rule sets, through the `🌐 Overseas` group by default. Before nodes are tested a few downloads may fail; Mihomo retries automatically and everything is usually ready within a minute. Later starts load instantly from `./ruleset/`.
+2. The first start downloads about 20–45 rule sets, through `🌐 Other Overseas` by default. Before nodes are tested a few downloads may fail; Mihomo retries automatically and everything is usually ready within a minute. Later starts load instantly from `./ruleset/`.
 3. Every build is checked against the real Mihomo core: the config is first loaded and rewritten by Ruby's YAML (as OpenClash does), then run through `mihomo -t`. Values such as `off`, `yes` or `0755`, which YAML 1.1 would misread, are always quoted.
 
 ## Example output
 
-After importing `provider-a.yaml`, `provider-b.yaml`, `provider-c.yaml` with English group names:
+After importing `provider-a.yaml`, `provider-b.yaml`, `provider-c.yaml` with English group names (excerpt):
 
 ```yaml
 proxy-groups:
-  - name: 🤖 ChatGPT
-    type: select
-    proxies: [🇺🇸 United States Auto, 🇺🇸 United States Manual, 🇯🇵 Japan Auto, 🇸🇬 Singapore Auto, 📦 provider-a, 📦 provider-b, 📦 provider-c, ⚡ All Auto, 🌍 All Manual]
-  - name: 🇺🇸 United States Auto
+  - name: 🤖 ChatGPT              # a purpose: these lines in order, next one when a line fails
+    type: fallback
+    proxies: [🇺🇸 United States Auto, 🇯🇵 Japan Auto, 🇸🇬 Singapore Auto, ⚡ All Auto]
+  - name: 🍎 Apple
+    type: fallback
+    proxies: [DIRECT, ⚡ All Auto]
+  - name: 🇯🇵 Japan Auto           # a line: one region across files, fastest first
     type: url-test
-    proxies: ["[provider-a] US 01", "[provider-b] US LA"]
+    proxies: ["[provider-a] JP 01", "[provider-c] JP Tokyo"]
+  - name: 📦 provider-a Auto
+    type: url-test
+    proxies: ["[provider-a] US 01", "[provider-a] JP 01"]
 
 rules:
+  - RULE-SET,private,DIRECT
   - RULE-SET,openai,🤖 ChatGPT
-  - RULE-SET,google-gemini,✨ Gemini
-  - RULE-SET,github,🐙 GitHub
-  - RULE-SET,google,🔍 Google
-  - RULE-SET,cn,🇨🇳 Mainland China
-  - RULE-SET,geolocation-not-cn,🌐 Overseas
-  - MATCH,🌐 Overseas
+  - RULE-SET,anthropic,🧠 AI Tools
+  - RULE-SET,cn,DIRECT
+  - RULE-SET,geolocation-not-cn,🌐 Other Overseas
+  - MATCH,🌐 Other Overseas
 ```
+
 
 ## Project layout
 
 ```text
 src/
 ├── core/            pure-function compiler (no DOM), fully unit-tested
-├── catalog/         data-driven regions, rule sets, services, presets
+├── catalog/         data-driven regions, rule sets, services, default purposes
 ├── templates/base/  base templates (DNS / TUN / sniffer / ports)
 ├── i18n/            UI catalogs (zh-CN is the source; the type checker keeps the others in sync)
 ├── stores/          Pinia state and IndexedDB persistence
@@ -117,7 +120,7 @@ See [docs/architecture.md](docs/architecture.md).
 ## Privacy and security
 
 - Files are read with the browser File API; parsing and generation happen locally
-- No third-party APIs, no analytics; the only external requests are web fonts
+- No third-party APIs, no analytics; the page itself makes no external requests (your Mihomo downloads the rule sets)
 - Node data lives in IndexedDB only, never in localStorage
 - Exported project files exclude server / uuid / password by default
 

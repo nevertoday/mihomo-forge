@@ -6,7 +6,7 @@ import { issueText, t } from '@/i18n'
 import { useProjectStore } from '@/stores/project'
 import type { IssueLevel } from '@/types'
 
-defineProps<{ hideVerdict?: boolean }>()
+defineProps<{ hideVerdict?: boolean; issuesOnly?: boolean }>()
 const store = useProjectStore()
 const b = computed(() => store.build)
 const errors = computed(() => b.value.issues.filter((i) => i.level === 'ERROR'))
@@ -36,13 +36,13 @@ const issues = computed(() => [...b.value.issues].sort((x, y) => ORDER.indexOf(x
 
 <template>
   <div class="report">
-    <ul class="checklist">
+    <ul v-if="!issuesOnly" class="checklist">
       <li v-for="c in checklist" :key="c.text" :class="{ bad: !c.ok }">
         <Icon v-if="c.ok" name="Check" :size="16" /><Icon v-else name="CircleX" :size="16" />
         <span>{{ c.text }}</span>
       </li>
     </ul>
-    <p v-if="!hideVerdict" class="verdict" :class="b.ok ? 'ok' : 'bad'">{{ b.ok ? t('report.ok') : t('report.bad') }}</p>
+    <p v-if="!hideVerdict && !issuesOnly" class="verdict" :class="b.ok ? 'ok' : 'bad'">{{ b.ok ? t('report.ok') : t('report.bad') }}</p>
 
     <ul v-if="issues.length" class="issues">
       <li v-for="(i, idx) in issues" :key="idx" class="xxd-banner" data-size="sm" :data-tone="i.level === 'ERROR' ? 'danger' : i.level === 'WARNING' ? 'warning' : undefined">

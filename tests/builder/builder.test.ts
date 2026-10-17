@@ -284,3 +284,18 @@ describe('builder — behaviour', () => {
     expect(withNodes.sources[0].nodes).toHaveLength(2)
   })
 })
+
+describe('purposes — default lines', () => {
+  it('keeps only the default lines the imported files have, and leaves edited lines alone', async () => {
+    const { tidyDefaultLines } = await import('@/catalog/purposes')
+    const s = settings()
+    const telegram = s.purposes.find((p) => p.id === 'telegram')!
+    const chatgpt = s.purposes.find((p) => p.id === 'chatgpt')!
+    chatgpt.lines = ['region:hk', 'all']
+    const r = buildConfig(await exampleSources(), s)
+    const refs = new Set(r.lines.map((l) => l.ref))
+    tidyDefaultLines(s.purposes, (ref) => refs.has(ref))
+    expect(telegram.lines).toEqual(['region:sg', 'region:jp', 'region:us', 'all'])
+    expect(chatgpt.lines).toEqual(['region:hk', 'all'])
+  })
+})

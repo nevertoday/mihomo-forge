@@ -63,69 +63,54 @@ async function remove() {
 </script>
 
 <template>
-  <article class="card source-card" :class="{ 'is-waiting': waiting }">
-    <header class="sc-head">
-      <div class="sc-title">
+  <li class="source" :class="{ 'is-waiting': waiting }">
+    <div class="main">
+      <div class="title">
         <template v-if="!editing">
           <h3 dir="auto">{{ source.name }}</h3>
-          <button v-if="actions" type="button" class="xxd-btn rename-btn" data-variant="ghost" data-icon-only data-size="xs" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil" :size="14" /></button>
+          <button type="button" class="xxd-btn rename-btn" data-variant="ghost" data-icon-only data-size="xs" :aria-label="t('sourceCard.rename')" @click="startRename"><Icon name="Pencil" :size="14" /></button>
         </template>
         <form v-else class="rename" @submit.prevent="commitRename">
-          <input ref="nameInput" v-model="draft" class="xxd-input" maxlength="32" dir="auto" :aria-label="t('sourceCard.nameLabel')" @keydown.esc="editing = false" @blur="commitRename" />
+          <input ref="nameInput" v-model="draft" class="xxd-input" data-size="sm" maxlength="32" dir="auto" :aria-label="t('sourceCard.nameLabel')" @keydown.esc="editing = false" @blur="commitRename" />
         </form>
       </div>
-    </header>
-    <p v-if="error" class="sc-error">{{ error }}</p>
-    <p class="sc-file mono" dir="auto">{{ source.originalFileName }}</p>
-
-    <p v-if="waiting" class="xxd-banner sc-wait" data-tone="warning" data-size="sm">{{ t('sourceCard.waiting', { file: source.originalFileName }) }}</p>
-    <template v-else>
-      <dl class="sc-counts">
-        <div><dt>{{ t('sourceCard.valid') }}</dt><dd class="num">{{ built.length }}</dd></div>
-        <div><dt>{{ t('sourceCard.duplicates') }}</dt><dd class="num" :class="{ muted: !duplicates }">{{ duplicates }}</dd></div>
-        <div><dt>{{ t('sourceCard.rejected') }}</dt><dd class="num" :class="{ muted: !source.rejected.length }">{{ source.rejected.length }}</dd></div>
-      </dl>
-      <div class="sc-regions">
-        <span v-for="r in regionChips" :key="r.id" class="xxd-badge"><span>{{ r.label }}</span><span class="num">{{ r.count }}</span></span>
-      </div>
-    </template>
-
-    <footer v-if="actions" class="sc-actions">
+      <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="waiting" class="meta wait">{{ t('sourceCard.waiting', { file: source.originalFileName }) }}</p>
+      <p v-else class="meta">
+        <span class="mono" dir="auto">{{ source.originalFileName }}</span>
+        <span>{{ t('sourceCard.valid') }} <b class="num">{{ built.length }}</b></span>
+        <span v-if="duplicates">{{ t('sourceCard.duplicates') }} <b class="num">{{ duplicates }}</b></span>
+        <span v-if="source.rejected.length">{{ t('sourceCard.rejected') }} <b class="num">{{ source.rejected.length }}</b></span>
+        <span v-if="regionChips.length" class="regions">{{ regionChips.map((r) => `${r.label} ${r.count}`).join(' · ') }}</span>
+      </p>
+    </div>
+    <div class="acts">
       <button type="button" class="xxd-btn" data-size="sm" :disabled="waiting" @click="emit('view', source)"><Icon name="Eye" :size="16" /><span>{{ t('sourceCard.view') }}</span></button>
       <button type="button" class="xxd-btn" data-size="sm" @click="fileInput?.click()"><Icon name="FileUp" :size="16" /><span>{{ t('sourceCard.replace') }}</span></button>
-      <span class="spacer"></span>
-      <div v-if="total > 1" class="order">
+      <template v-if="total > 1">
         <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === 0" :aria-label="t('sourceCard.moveUp')" @click="store.moveSource(source.id, -1)"><Icon name="ArrowUp" :size="16" /></button>
         <button type="button" class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" :disabled="index === total - 1" :aria-label="t('sourceCard.moveDown')" @click="store.moveSource(source.id, 1)"><Icon name="ArrowDown" :size="16" /></button>
-      </div>
+      </template>
       <button type="button" class="xxd-btn danger" data-variant="ghost" data-icon-only data-size="sm" :aria-label="t('sourceCard.remove')" @click="remove"><Icon name="Trash" :size="16" /></button>
       <input ref="fileInput" type="file" accept=".yaml,.yml,.txt" hidden @change="replace(($event.target as HTMLInputElement).files)" />
-    </footer>
-  </article>
+    </div>
+  </li>
 </template>
 
 <style scoped>
-.source-card { display: flex; flex-direction: column; gap: var(--space-3); }
-.source-card.is-waiting { border-style: dashed; }
-.sc-head { display: flex; align-items: center; gap: var(--space-2); }
-.sc-title { display: flex; align-items: center; gap: var(--space-1); flex: 1; min-width: 0; }
-.sc-title h3 { margin: 0; overflow: hidden; font: var(--weight-strong) var(--text-lg) / var(--leading-md) var(--font-title); text-overflow: ellipsis; white-space: nowrap; }
-.rename { flex: 1; }
-.rename .xxd-input { height: var(--control-h-sm); font-weight: var(--weight-medium); }
-.sc-error { margin: 0; color: var(--danger); font-size: var(--text-xs); line-height: var(--leading-sm); }
-/* The file name belongs to the title: closer to it than to the counts. */
-.sc-file { margin: calc(-1 * var(--space-2)) 0 0; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
-.sc-wait { margin: 0; }
-/* Counts: three columns separated by space, not a box inside the card. */
-.sc-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin: 0; }
-.sc-counts div { display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-0-5); }
-.sc-counts dt { color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-xs); }
-.sc-counts dd { margin: 0; font: var(--weight-strong) var(--text-xl) / var(--leading-lg) var(--font-body); }
-.sc-regions { display: flex; flex-wrap: wrap; gap: var(--space-1); min-height: 20px; }
-.sc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1-5); margin-top: auto; }
-/* Button labels never shrink: the row wraps instead. */
-.sc-actions .xxd-btn { flex: none; }
-.danger:hover:not(:disabled) { color: var(--danger); }
-.order { display: flex; }
+/* One row per file: who it is and what it brought on the left, what you can do on the right. */
+.source { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); padding: var(--space-3) 0; }
+.main { flex: 1 1 260px; display: grid; gap: var(--space-0-5); min-width: 0; }
+.title { display: flex; align-items: center; gap: var(--space-1); min-width: 0; }
+h3 { margin: 0; overflow: hidden; font: var(--weight-medium) var(--text-base) / var(--leading-sm) var(--font-body); text-overflow: ellipsis; white-space: nowrap; }
 .rename-btn { color: var(--muted); }
+.rename { flex: 1; max-width: 280px; }
+.meta { display: flex; flex-wrap: wrap; gap: 0 var(--space-3); margin: 0; color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-sm); }
+.meta b { color: var(--ink); font-weight: var(--weight-medium); }
+.meta.wait { color: var(--warning); }
+.error { margin: 0; color: var(--danger); font-size: var(--text-xs); }
+.acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
+/* Button labels never shrink: the row wraps instead. */
+.acts .xxd-btn { flex: none; }
+.danger:hover:not(:disabled) { color: var(--danger); }
 </style>

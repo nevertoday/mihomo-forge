@@ -3,6 +3,7 @@ import { computed, markRaw, reactive, ref, shallowRef, watch } from 'vue'
 import { buildConfig } from '@/core/builder'
 import { SourceParseError, sourceNameFromFile } from '@/core/parser'
 import { diffSources, loadSourceFile, renameSource, type SourceDiff } from '@/core/parser/loadSource'
+import { tidyDefaultLines } from '@/catalog/purposes'
 import { createDefaultSettings, isDefaultProjectName, normalizeSettings } from '@/core/project/defaults'
 import { exportProject, importProject, PROJECT_FILE_NAME, ProjectFileError } from '@/core/project/projectFile'
 import { locale, t, tDynamic } from '@/i18n'
@@ -10,7 +11,7 @@ import type { ProjectSettings, Source } from '@/types'
 import { downloadText } from '@/utils/download'
 import { idbDelete, idbGet, idbSet } from '@/utils/idb'
 
-export type ViewId = 'overview' | 'sources' | 'strategies' | 'rules' | 'base' | 'build'
+export type ViewId = 'home' | 'advanced'
 
 export interface PendingReplacement {
   existing: Source
@@ -109,7 +110,11 @@ export const useProjectStore = defineStore('project', () => {
         notify(t('toast.fileError', { file: file.name, message }), 'error')
       }
     }
-    if (added) notify(t('toast.imported', { n: added }), 'success')
+    if (added) {
+      const refs = new Set(build.value.lines.map((l) => l.ref))
+      tidyDefaultLines(settings.purposes, (ref) => refs.has(ref))
+      notify(t('toast.imported', { n: added }), 'success')
+    }
   }
 
   /** Replace only that source; every rule, region, business and combo setting is kept (spec §8). */
